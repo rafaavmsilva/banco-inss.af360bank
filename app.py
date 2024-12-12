@@ -180,8 +180,13 @@ def capital_giro():
 
 @app.route("/usuarios")
 def usuarios():
-    users = User.query.all()
-    return render_template('usuarios.html', users=users)
+    try:
+        users = User.query.all()
+        print("Users retrieved successfully:", [{"id": user.id, "name": user.name, "email": user.email} for user in users])
+        return render_template('usuarios.html', users=users)
+    except Exception as e:
+        print("Error in usuarios route:", str(e))
+        return render_template('usuarios.html', users=[], error="Error loading users")
 
 @app.route("/criar-usuario", methods=["POST"])
 def criar_usuario():

@@ -10,6 +10,10 @@
         {% endif %}
     {% endwith %}
 
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
     <h2>Usuários</h2>
     
     <div class="mb-4">
@@ -31,23 +35,29 @@
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.phone }}</td>
-                    <td>{{ user.role }}</td>
-                    <td>
-                        <span class="badge {% if user.status == 'active' %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ user.status }}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="editUser({{ user.id }})">Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser({{ user.id }})">Excluir</button>
-                    </td>
-                </tr>
-                {% endfor %}
+                {% if users %}
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            <span class="badge {% if user.status == 'active' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ user.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editUser({{ user.id }})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser({{ user.id }})">Excluir</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Nenhum usuário encontrado</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
