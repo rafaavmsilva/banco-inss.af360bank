@@ -24,47 +24,21 @@ migrate = Migrate(app, db)
 def init_db():
     with app.app_context():
         try:
-            # Try to create tables if they don't exist
-            db.create_all()
-            
             # Get database connection
             conn = db.engine.connect()
             
-            # Check if the columns exist and add them if they don't
+            # Drop the users table if it exists and recreate it with the correct structure
             conn.execute(db.text("""
-                DO $$
-                BEGIN
-                    BEGIN
-                        ALTER TABLE users ADD COLUMN IF NOT EXISTS name VARCHAR(100) NOT NULL DEFAULT '';
-                    EXCEPTION WHEN OTHERS THEN
-                        NULL;
-                    END;
-                    
-                    BEGIN
-                        ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(120) NOT NULL DEFAULT '';
-                    EXCEPTION WHEN OTHERS THEN
-                        NULL;
-                    END;
-                    
-                    BEGIN
-                        ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT NULL;
-                    EXCEPTION WHEN OTHERS THEN
-                        NULL;
-                    END;
-                    
-                    BEGIN
-                        ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT NULL;
-                    EXCEPTION WHEN OTHERS THEN
-                        NULL;
-                    END;
-                    
-                    BEGIN
-                        ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
-                    EXCEPTION WHEN OTHERS THEN
-                        NULL;
-                    END;
-                END;
-                $$;
+                DROP TABLE IF EXISTS users CASCADE;
+                
+                CREATE TABLE users (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL,
+                    email VARCHAR(120) NOT NULL UNIQUE,
+                    phone VARCHAR(20),
+                    role VARCHAR(50),
+                    status VARCHAR(20) DEFAULT 'active'
+                );
             """))
             
             db.session.commit()
