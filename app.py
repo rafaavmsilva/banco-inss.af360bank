@@ -21,9 +21,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-with app.app_context():
-    db.create_all()
-    db.session.commit()
+def init_db():
+    with app.app_context():
+        # Drop all tables
+        db.drop_all()
+        # Create all tables
+        db.create_all()
+        db.session.commit()
+        print("Database initialized successfully!")
+
+# Initialize database tables
+init_db()
 
 # User Model
 class User(db.Model):
