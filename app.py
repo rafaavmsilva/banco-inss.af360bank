@@ -14,7 +14,7 @@ CORS(app)
 
 # Flask configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://af360bank_db_user:jAO3e85X5e7cuDzIYpCpuGyo5VeVcRPy@dpg-ctcr4taj1k6c73flmt1g-a/af360bank_db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL').replace('postgres://', 'postgresql://') if os.getenv('DATABASE_URL') else 'postgresql://af360bank_db_user:jAO3e85X5e7cuDzIYpCpuGyo5VeVcRPy@dpg-ctcr4taj1k6c73flmt1g-a/af360bank_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -358,6 +358,12 @@ def salvar_tabela():
 def alterar_status_tabela(identificador):
     # Aqui você implementaria a lógica para alterar o status no banco de dados
     return jsonify({"success": True, "message": "Status alterado com sucesso"})
+
+@app.cli.command("init-db")
+def init_db_command():
+    """Initialize the database."""
+    db.create_all()
+    print("Initialized the database.")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
