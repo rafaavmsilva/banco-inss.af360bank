@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .table {
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #8b9abe;
+        border-bottom: 2px solid #2d3748;
+        padding: 12px 8px;
+        white-space: nowrap;
+    }
+
+    .table td {
+        color: #e2e8f0;
+        padding: 12px 8px;
+        border-color: #2d3748;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(45, 55, 72, 0.7);
+    }
+
+    .form-label {
+        color: #8b9abe;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        background-color: #1a202c !important;
+        border: 1px solid #2d3748;
+        color: #e2e8f0 !important;
+        padding: 0.625rem;
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #4a5568;
+        box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.25);
+    }
+
+    .modal-content {
+        background-color: #1a202c;
+        border: 1px solid #2d3748;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #2d3748;
+        padding: 1.25rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #2d3748;
+        padding: 1.25rem;
+    }
+
+    .btn {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 0.625rem 1.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-success {
+        background-color: #48bb78;
+        border-color: #48bb78;
+    }
+
+    .btn-success:hover {
+        background-color: #38a169;
+        border-color: #38a169;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.75em;
+        font-size: 0.85rem;
+    }
+
+    .identificador {
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: #9f7aea;
+    }
+
+    .dropdown-menu {
+        background-color: #1a202c;
+        border: 1px solid #2d3748;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-item {
+        color: #e2e8f0;
+        padding: 0.625rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .dropdown-item:hover {
+        background-color: #2d3748;
+        color: #fff;
+    }
+
+    h2 {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">Administração de tabelas</h2>
+        <button class="btn btn-success" onclick="abrirModalTabela()">
+            <i class="fas fa-plus me-2"></i>ADICIONAR TABELA
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>IDENTIFICADOR</th>
+                    <th>TABELA</th>
+                    <th>REGRA DE TC</th>
+                    <th>ANTIFRAUDE</th>
+                    <th>BANCO</th>
+                    <th>ÓRGÃO</th>
+                    <th>FUNDO</th>
+                    <th style="text-align: center">TAXA MENSAL</th>
+                    <th>STATUS</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tabela in tabelas %}
+                <tr>
+                    <td class="identificador">{{ tabela.identificador }}</td>
+                    <td>{{ tabela.nome }}</td>
+                    <td>{{ tabela.regra_tc }}</td>
+                    <td>{{ tabela.antifraude }}</td>
+                    <td>{{ tabela.banco }}</td>
+                    <td>{{ tabela.orgao }}</td>
+                    <td>{{ tabela.fundo }}</td>
+                    <td style="text-align: center">{{ tabela.taxa_mensal }}%</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if tabela.ativo else 'danger' }}">
+                            {{ 'Ativo' if tabela.ativo else 'Inativo' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="editarTabela('{{ tabela.identificador }}')">
+                                        <i class="fas fa-edit me-2"></i>Editar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="alterarStatus('{{ tabela.identificador }}')">
+                                        <i class="fas fa-power-off me-2"></i>Alterar Status
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Tabela -->
+<div class="modal fade" id="modalTabela" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white" id="modalTitle">Criar Tabela</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formTabela">
+                    <input type="hidden" id="identificador" name="identificador">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Banco</label>
+                        <select class="form-select" id="banco" name="banco" required>
+                            <option value="TRUSTIC">TRUSTIC</option>
+                            <option value="BMP">BMP</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Convênio</label>
+                        <select class="form-select" id="orgao" name="orgao" required>
+                            <option value="FGTS">FGTS</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fundo</label>
+                        <select class="form-select" id="fundo" name="fundo" required>
+                            <option value="Via Invest">Via Invest</option>
+                            <option value="Brave">Brave</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Taxa Mensal</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="taxa_mensal" name="taxa_mensal" step="0.01" required>
+                            <span class="input-group-text bg-dark text-white border-secondary">%</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Antifraude</label>
+                        <select class="form-select" id="antifraude" name="antifraude" required>
+                            <option value="TRUSTIC">TRUSTIC</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CANCELAR</button>
+                <button type="button" class="btn btn-success" onclick="salvarTabela()">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let tabelaModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    tabelaModal = new bootstrap.Modal(document.getElementById('modalTabela'));
+});
+
+function abrirModalTabela() {
+    document.getElementById('modalTitle').textContent = 'Criar Tabela';
+    document.getElementById('formTabela').reset();
+    document.getElementById('identificador').value = '';
+    tabelaModal.show();
+}
+
+function editarTabela(identificador) {
+    document.getElementById('modalTitle').textContent = 'Atualizar Tabela';
+    
+    fetch(`/tabelas/${identificador}`)
+        .then(response => response.json())
+        .then(tabela => {
+            document.getElementById('identificador').value = tabela.identificador;
+            document.getElementById('nome').value = tabela.nome;
+            document.getElementById('banco').value = tabela.banco;
+            document.getElementById('orgao').value = tabela.orgao;
+            document.getElementById('fundo').value = tabela.fundo;
+            document.getElementById('taxa_mensal').value = tabela.taxa_mensal;
+            document.getElementById('antifraude').value = tabela.antifraude;
+            
+            tabelaModal.show();
+        });
+}
+
+function salvarTabela() {
+    const formData = new FormData(document.getElementById('formTabela'));
+    const dados = Object.fromEntries(formData.entries());
+    
+    fetch('/tabelas/salvar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            tabelaModal.hide();
+            window.location.reload();
+        } else {
+            alert('Erro ao salvar tabela: ' + result.message);
+        }
+    });
+}
+
+function alterarStatus(identificador) {
+    if (confirm('Deseja realmente alterar o status desta tabela?')) {
+        fetch(`/tabelas/${identificador}/status`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                window.location.reload();
+            } else {
+                alert('Erro ao alterar status: ' + result.message);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

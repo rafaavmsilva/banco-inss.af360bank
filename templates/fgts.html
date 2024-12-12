@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Simulação de FGTS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Simulação de FGTS</h2>
+
+    <!-- Formulário de Simulação -->
+    <div class="card bg-dark text-white">
+        <div class="card-body">
+            <form id="fgtsForm" class="row g-3">
+                <div class="col-md-6">
+                    <label for="banco" class="form-label">Banco</label>
+                    <div class="dropdown">
+                        <button class="form-select bg-dark text-white border-secondary dropdown-toggle" type="button" id="bancoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            BMP
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="bancoDropdown">
+                            <li><a class="dropdown-item active" href="#">BMP</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="cpf" class="form-label">CPF</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" id="cpf" name="cpf" placeholder="Digite o CPF">
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4" id="consultarBtn">
+                        CONSULTAR
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultado da Simulação (inicialmente oculto) -->
+    <div id="resultadoSimulacao" class="mt-4" style="display: none;">
+        <div class="card bg-dark text-white">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Resultado da Simulação</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Saldo Total FGTS</h6>
+                                <h4 class="card-title" id="saldoTotal">R$ 0,00</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Parcelas Disponíveis</h6>
+                                <h4 class="card-title" id="parcelasDisponiveis">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Valor da Parcela</h6>
+                                <h4 class="card-title" id="valorParcela">R$ 0,00</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        background-color: #2b2b2b !important;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #2b2b2b !important;
+        color: white !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 255, 157, 0.25);
+        border-color: #00ff9d;
+    }
+    .btn-primary {
+        background-color: #00ff9d;
+        border-color: #00ff9d;
+        color: #000;
+    }
+    .btn-primary:hover {
+        background-color: #00cc7d;
+        border-color: #00cc7d;
+        color: #000;
+    }
+    .card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dropdown-menu-dark {
+        background-color: #2b2b2b;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dropdown-item.active {
+        background-color: #00ff9d;
+        color: #000;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Máscara para CPF
+        $('#cpf').mask('000.000.000-00');
+
+        // Manipulação do formulário
+        $('#fgtsForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulação de carregamento
+            $('#consultarBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Consultando...');
+            
+            // Simular uma chamada à API
+            setTimeout(function() {
+                $('#resultadoSimulacao').slideDown();
+                $('#saldoTotal').text('R$ 15.000,00');
+                $('#parcelasDisponiveis').text('12');
+                $('#valorParcela').text('R$ 1.250,00');
+                
+                $('#consultarBtn').prop('disabled', false).text('CONSULTAR');
+            }, 1500);
+        });
+    });
+</script>
+{% endblock %}

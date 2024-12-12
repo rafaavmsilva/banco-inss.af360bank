@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Perfis e permissões</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAdicionarPerfil">
+            <i class="fas fa-plus me-2"></i>ADICIONAR PERFIL
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="card bg-dark">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>NOME</th>
+                            <th>VISÍVEL PARA O PARCEIRO</th>
+                            <th class="text-end">AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in perfis %}
+                        <tr>
+                            <td>{{ perfil.nome }}</td>
+                            <td>
+                                <span class="text-{{ 'success' if perfil.visivel_parceiro else 'danger' }}">
+                                    {{ 'Sim' if perfil.visivel_parceiro else 'Não' }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-link text-light" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="carregarPerfil('{{ perfil.nome }}')">
+                                            <i class="fas fa-edit me-2"></i>Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" onclick="excluirPerfil('{{ perfil.nome }}')">
+                                            <i class="fas fa-trash me-2"></i>Excluir
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Perfil -->
+<div class="modal fade" id="modalPerfil" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Perfil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formPerfil">
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Perfil</label>
+                        <input type="text" class="form-control bg-dark text-white" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="visivel_parceiro" id="visivelParceiro">
+                            <label class="form-check-label" for="visivelParceiro">
+                                Visível para Parceiro
+                            </label>
+                        </div>
+                    </div>
+                    <div class="accordion" id="permissoesAccordion">
+                        <!-- Propostas -->
+                        <div class="accordion-item bg-dark text-white">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePropostas">
+                                    Propostas
+                                </button>
+                            </h2>
+                            <div id="collapsePropostas" class="accordion-collapse collapse show" data-bs-parent="#permissoesAccordion">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="simular_fgts">
+                                                <label class="form-check-label">Simular FGTS</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="simular_emprestimo_pessoal">
+                                                <label class="form-check-label">Simular Empréstimo Pessoal</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="simular_capital_giro">
+                                                <label class="form-check-label">Simular Capital de Giro</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="cadastrar_proposta_fgts">
+                                                <label class="form-check-label">Cadastrar Proposta FGTS</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="cadastrar_proposta_emprestimo">
+                                                <label class="form-check-label">Cadastrar Proposta Empréstimo</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="cadastrar_proposta_capital">
+                                                <label class="form-check-label">Cadastrar Proposta Capital</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="acessar_esteira">
+                                                <label class="form-check-label">Acessar Esteira</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="aprovar_proposta">
+                                                <label class="form-check-label">Aprovar Proposta</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="cancelar_proposta">
+                                                <label class="form-check-label">Cancelar Proposta</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="acompanhar_comissoes">
+                                                <label class="form-check-label">Acompanhar Comissões</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Administração -->
+                        <div class="accordion-item bg-dark text-white">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-dark text-white collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdmin">
+                                    Administração
+                                </button>
+                            </h2>
+                            <div id="collapseAdmin" class="accordion-collapse collapse" data-bs-parent="#permissoesAccordion">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="listar_usuarios">
+                                                <label class="form-check-label">Listar Usuários</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="criar_usuarios">
+                                                <label class="form-check-label">Criar Usuários</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="atualizar_usuarios">
+                                                <label class="form-check-label">Atualizar Usuários</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="excluir_usuarios">
+                                                <label class="form-check-label">Excluir Usuários</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="listar_parceiros">
+                                                <label class="form-check-label">Listar Parceiros</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="adicionar_parceiros">
+                                                <label class="form-check-label">Adicionar Parceiros</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="gerenciar_parceiros">
+                                                <label class="form-check-label">Gerenciar Parceiros</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissoes" value="redefinir_senha">
+                                                <label class="form-check-label">Redefinir Senha</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Configurações -->
+                        <div class="accordion-item bg-dark text-white">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-dark text-white collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConfig">
+                                    Configurações
+                                </button>
+                            </h2>
+                            <div id="collapseConfig" class="accordion-collapse collapse" data-bs-parent="#permissoesAccordion">
+                                <div class="accordion-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="permissoes" value="gerenciar_configuracoes">
+                                        <label class="form-check-label">Gerenciar Configurações</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="salvarPerfil()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        background-color: #2b2b2b !important;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        border-top: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #2b2b2b;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+function carregarPerfil(nome) {
+    fetch(`/perfis/${nome}`)
+        .then(response => response.json())
+        .then(perfil => {
+            document.querySelector('#formPerfil [name="nome"]').value = perfil.nome;
+            document.querySelector('#visivelParceiro').checked = perfil.visivel_parceiro;
+            
+            // Limpar todas as permissões
+            document.querySelectorAll('[name="permissoes"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Marcar as permissões do perfil
+            perfil.permissoes.forEach(permissao => {
+                const checkbox = document.querySelector(`[name="permissoes"][value="${permissao}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+            
+            // Abrir o modal
+            new bootstrap.Modal(document.getElementById('modalPerfil')).show();
+        });
+}
+
+function salvarPerfil() {
+    const form = document.getElementById('formPerfil');
+    const permissoesSelecionadas = Array.from(form.querySelectorAll('[name="permissoes"]:checked'))
+        .map(checkbox => checkbox.value);
+    
+    const dados = {
+        nome: form.querySelector('[name="nome"]').value,
+        visivel_parceiro: form.querySelector('#visivelParceiro').checked,
+        permissoes: permissoesSelecionadas
+    };
+    
+    fetch('/perfis/atualizar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalPerfil')).hide();
+            // Recarregar a lista de perfis
+            carregarPerfis();
+        } else {
+            alert('Erro ao salvar o perfil');
+        }
+    });
+}
+
+function excluirPerfil(nome) {
+    Swal.fire({
+        title: 'Tem certeza?',
+        text: "Esta ação não poderá ser revertida!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Implementar exclusão
+        }
+    });
+}
+</script>
+{% endblock %}

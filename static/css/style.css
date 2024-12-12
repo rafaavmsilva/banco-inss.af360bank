@@ -1,0 +1,63 @@
+.sidebar {
+    background-color: #1a1a1a;
+    color: white;
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+.sidebar .nav-link {
+    color: white;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #333;
+    text-decoration: none;
+}
+
+.main-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.table-dark {
+    background-color: #1a1a1a;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.status-desembolsado {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-cancelado {
+    background-color: #dc3545;
+    color: white;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 0.2rem rgba(26, 26, 26, 0.25);
+}
+
+.btn-primary {
+    background-color: #1a1a1a;
+    border-color: #1a1a1a;
+}
+
+.btn-primary:hover {
+    background-color: #333;
+    border-color: #333;
+}

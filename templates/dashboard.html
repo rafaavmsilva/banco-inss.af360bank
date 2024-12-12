@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Dashboard</h2>
+        </div>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Propostas</h5>
+                    <h2 class="card-text">{{ total_propostas }}</h2>
+                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Propostas Aprovadas</h5>
+                    <h2 class="card-text">{{ propostas_aprovadas }}</h2>
+                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Em Análise</h5>
+                    <h2 class="card-text">{{ propostas_analise }}</h2>
+                    <p class="card-text"><small>Atualmente</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Propostas Recusadas</h5>
+                    <h2 class="card-text">{{ propostas_recusadas }}</h2>
+                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12 text-end">
+            <a href="/esteira-propostas" class="btn btn-success">
+                <i class="fas fa-list me-2"></i>Esteira de Propostas
+            </a>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Propostas por Status</h5>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Volume de Propostas</h5>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas Propostas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Últimas Propostas</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>CCB</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for proposta in ultimas_propostas %}
+                                <tr>
+                                    <td>{{ proposta.ccb }}</td>
+                                    <td>{{ proposta.cliente }}</td>
+                                    <td>R$ {{ proposta.valor }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ proposta.status_class }}">
+                                            {{ proposta.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ proposta.data }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Aprovadas', 'Em Análise', 'Recusadas'],
+            datasets: [{
+                data: [{{ propostas_aprovadas }}, {{ propostas_analise }}, {{ propostas_recusadas }}],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107',
+                    '#dc3545',
+                ]
+            }]
+        }
+    });
+
+    // Gráfico de Volume
+    const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+    new Chart(volumeCtx, {
+        type: 'line',
+        data: {
+            labels: {{ datas_volume|safe }},
+            datasets: [{
+                label: 'Volume de Propostas',
+                data: {{ valores_volume }},
+                borderColor: '#007bff',
+                tension: 0.1,
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

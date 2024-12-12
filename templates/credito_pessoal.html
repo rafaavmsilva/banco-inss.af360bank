@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Crédito Pessoal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Crédito Pessoal</h2>
+
+    <!-- Mensagem de Erro -->
+    <div class="card bg-dark text-white">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-exclamation-circle text-warning mb-3" style="font-size: 48px;"></i>
+            <h4 class="mt-3">Você não possui nenhum banco configurado para Crédito Pessoal.</h4>
+            <p class="text-muted mt-2">Entre em contato com o suporte para mais informações.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .text-warning {
+        color: #ffc107 !important;
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+</style>
+{% endblock %}
