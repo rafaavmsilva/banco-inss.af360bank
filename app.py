@@ -396,9 +396,5 @@ def alterar_status_tabela(identificador):
 @app.cli.command("init-db")
 def init_db_command():
     """Initialize the database."""
-    db.create_all()
+    init_db()
     print("Initialized the database.")
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)
