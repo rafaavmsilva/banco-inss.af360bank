@@ -21,6 +21,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+with app.app_context():
+    db.create_all()
+    db.session.commit()
+
 # User Model
 class User(db.Model):
     __tablename__ = 'users'
