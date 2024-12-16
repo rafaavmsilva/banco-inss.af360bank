@@ -29,16 +29,6 @@ class INSSProposal(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('authenticated'):
-            # Store the requested URL for redirecting after authentication
-            session['next_url'] = request.url
-            return redirect(url_for('auth_login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
 def create_app():
     app = Flask(__name__)
     
@@ -66,9 +56,12 @@ def create_app():
     # Auth client initialization
     auth_client = AuthClient(
         auth_server_url=os.getenv('AUTH_SERVER_URL', 'https://af360bank.onrender.com'),
-        app_name=os.getenv('APP_NAME', 'sistema-comissoes')
+        app_name="banco-af360bank"
     )
     auth_client.init_app(app)
+
+    # Use auth_client's login_required instead of local one
+    login_required = auth_client.login_required
 
     @app.route('/')
     @login_required
