@@ -1,5 +1,6 @@
 Flask==2.3.3
 Werkzeug==2.3.7
+<<<<<<< HEAD
 requests==2.31.0
 python-dotenv==1.0.0
 flask-cors==4.0.0
@@ -13,3 +14,8 @@ Flask-Limiter==3.5.0
 Flask-WTF==1.2.1
 reportlab==4.0.8
 python-dateutil==2.8.2
+=======
+python-dotenv==1.0.0
+requests==2.31.0
+gunicorn==21.2.0
+>>>>>>> 962a945fa4dd789bd430a42a045294721c2935cb

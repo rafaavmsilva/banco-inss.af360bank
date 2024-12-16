@@ -1,6 +1,12 @@
 .env
 __pycache__/
 *.pyc
+<<<<<<< HEAD
 .venv/
 .idea/
 .vscode/
+=======
+.DS_Store
+venv/
+migrations/
+>>>>>>> 962a945fa4dd789bd430a42a045294721c2935cb
