@@ -29,5 +29,4 @@ def nova_proposta():
         return jsonify({"status": "success", "message": "Proposta recebida"})
     return render_template('nova_proposta.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+app.run(debug=True)
