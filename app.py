@@ -63,6 +63,11 @@ def create_app():
     # Use auth_client's login_required instead of local one
     login_required = auth_client.login_required
 
+    @app.route('/login')
+    def login():
+        """Redirect to auth server login"""
+        return redirect(os.getenv('AUTH_SERVER_URL', 'https://af360bank.onrender.com') + '/login')
+
     @app.route('/')
     @login_required
     def dashboard():
