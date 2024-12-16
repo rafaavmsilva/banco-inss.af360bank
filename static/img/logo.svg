@@ -5,6 +5,4 @@
     .subtext { font: 16px sans-serif; fill: #ffffff; }
   </style>
   <rect width="100%" height="100%" fill="transparent"/>
-  <text x="10" y="35" class="text">NE Pay</text>
-  <text x="10" y="55" class="subtext">Empréstimos</text>
 </svg>

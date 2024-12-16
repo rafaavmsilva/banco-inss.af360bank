@@ -80,6 +80,27 @@ body {
     padding-left: 20px;
 }
 
+.logo-top {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--sidebar-bg);
+}
+
+.logo-top img {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.logo-top span {
+    display: block;
+    color: var(--text-light);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
 .logo-bottom {
     padding: 20px;
     text-align: center;
