@@ -36,12 +36,17 @@ body {
     width: 250px;
     background-color: var(--sidebar-bg);
     color: var(--text-light);
-    padding: 20px 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 20px 0;
 }
 
 .sidebar .nav-item {
@@ -76,9 +81,17 @@ body {
 }
 
 .logo-bottom {
-    margin-top: auto;
     padding: 20px;
     text-align: center;
+    border-top: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.logo-bottom img {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 /* Main Content */
