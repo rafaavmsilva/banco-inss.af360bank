@@ -33,7 +33,9 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('authenticated'):
-            return redirect('https://af360bank.onrender.com/login')
+            # Store the requested URL for redirecting after authentication
+            session['next_url'] = request.url
+            return redirect(url_for('auth_login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -143,6 +145,47 @@ def create_app():
             flash('Proposta de refinanciamento criada com sucesso!', 'success')
             return redirect(url_for('dashboard'))
         return render_template('inss/refinanciamento.html')
+
+    @app.route('/auth/login')
+    def auth_login():
+        """Initiate the authentication process"""
+        redirect_uri = url_for('auth_callback', _external=True)
+        return redirect(auth_client.get_authorization_url(redirect_uri))
+
+    @app.route('/auth/callback')
+    def auth_callback():
+        """Handle the authentication callback from AF360 Bank"""
+        code = request.args.get('code')
+        if not code:
+            flash('Authentication failed. Please try again.', 'error')
+            return redirect(url_for('dashboard'))
+
+        try:
+            # Exchange the code for an access token
+            token_response = auth_client.get_token(code, url_for('auth_callback', _external=True))
+            
+            if token_response and token_response.get('access_token'):
+                session['authenticated'] = True
+                session['access_token'] = token_response['access_token']
+                
+                # Redirect to the originally requested URL if it exists
+                next_url = session.pop('next_url', None)
+                if next_url:
+                    return redirect(next_url)
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Failed to obtain access token', 'error')
+                return redirect(url_for('dashboard'))
+                
+        except Exception as e:
+            flash(f'Authentication error: {str(e)}', 'error')
+            return redirect(url_for('dashboard'))
+
+    @app.route('/auth/logout')
+    def auth_logout():
+        """Handle user logout"""
+        session.clear()
+        return redirect(url_for('dashboard'))
 
     return app
 
