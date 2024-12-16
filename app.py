@@ -25,14 +25,22 @@ class INSSProposal(db.Model):
 
 def create_app():
     app = Flask(__name__)
+    
+    # Load environment variables
     load_dotenv()
     
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    # Flask configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-123')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
+    
+    # Create tables
+    with app.app_context():
+        db.create_all()
     
     @app.route('/')
     def index():
@@ -79,6 +87,7 @@ def create_app():
     
     return app
 
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)
