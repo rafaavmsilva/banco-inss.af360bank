@@ -15,6 +15,41 @@ class AuthClient:
     def init_app(self, app):
         self.app = app
 
+        @app.route('/auth')
+        def auth():
+            """Handle the authentication token"""
+            token = request.args.get('token')
+            if not token:
+                return 'No token provided', 400
+
+            # Verify token with auth server
+            verify_response = requests.post(
+                f"{self.auth_server_url}/api/verify_token",
+                json={
+                    'token': token,
+                    'app_name': self.app_name
+                }
+            )
+
+            if verify_response.status_code != 200:
+                return 'Token verification failed', 400
+
+            token_data = verify_response.json()
+            if not token_data.get('valid'):
+                return 'Invalid token', 400
+
+            session['authenticated'] = True
+            session['user_id'] = token_data.get('data', {}).get('user_id')
+            session['access_token'] = token
+            session['user_role'] = token_data.get('data', {}).get('role')
+
+            # Redirect to dashboard or stored next_url
+            next_url = session.get('next_url')
+            if next_url:
+                session.pop('next_url', None)
+                return redirect(next_url)
+            return redirect('/')
+
         @app.route('/auth/callback')
         def auth_callback():
             """Handle the authentication callback from the auth server"""
@@ -41,3 +76,4 @@ class AuthClient:
             session['user_role'] = token_data.get('role')
 
             return redirect('/')
+
