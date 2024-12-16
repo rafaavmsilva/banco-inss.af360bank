@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text { font: bold 24px sans-serif; fill: #ffffff; }
+    .subtext { font: 16px sans-serif; fill: #ffffff; }
+  </style>
+  <rect width="100%" height="100%" fill="transparent"/>
+  <text x="10" y="35" class="text">NE Pay</text>
+  <text x="10" y="55" class="subtext">Empréstimos</text>
+</svg>

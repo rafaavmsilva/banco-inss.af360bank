@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Empréstimo INSS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Empréstimo INSS</h2>
+
+    <!-- Tabs para diferentes tipos de operações -->
+    <ul class="nav nav-tabs mb-4" id="operationTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="novo-tab" data-bs-toggle="tab" data-bs-target="#novo" type="button" role="tab" aria-controls="novo" aria-selected="true">
+                Novo Empréstimo
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="portabilidade-tab" data-bs-toggle="tab" data-bs-target="#portabilidade" type="button" role="tab" aria-controls="portabilidade" aria-selected="false">
+                Portabilidade
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="portabilidade-out-tab" data-bs-toggle="tab" data-bs-target="#portabilidade-out" type="button" role="tab" aria-controls="portabilidade-out" aria-selected="false">
+                Portabilidade Out
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="refinanciamento-tab" data-bs-toggle="tab" data-bs-target="#refinanciamento" type="button" role="tab" aria-controls="refinanciamento" aria-selected="false">
+                Refinanciamento
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="operationTabsContent">
+        <!-- Novo Empréstimo -->
+        <div class="tab-pane fade show active" id="novo" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <form id="novoEmprestimoForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="cpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control border-secondary" id="cpf" name="cpf" placeholder="Digite o CPF">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control border-secondary" id="dataNascimento" name="dataNascimento">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="renda" class="form-label">Renda Mensal</label>
+                            <input type="text" class="form-control border-secondary" id="renda" name="renda" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="valorEmprestimo" class="form-label">Valor Desejado</label>
+                            <input type="text" class="form-control border-secondary" id="valorEmprestimo" name="valorEmprestimo" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="prazo" class="form-label">Prazo (meses)</label>
+                            <select class="form-select border-secondary" id="prazo" name="prazo">
+                                <option value="12">12 meses</option>
+                                <option value="24">24 meses</option>
+                                <option value="36">36 meses</option>
+                                <option value="48">48 meses</option>
+                                <option value="60">60 meses</option>
+                                <option value="72">72 meses</option>
+                                <option value="84">84 meses</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">SIMULAR</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portabilidade -->
+        <div class="tab-pane fade" id="portabilidade" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <form id="portabilidadeForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="cpfPort" class="form-label">CPF</label>
+                            <input type="text" class="form-control border-secondary" id="cpfPort" name="cpf" placeholder="Digite o CPF">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dataNascimentoPort" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control border-secondary" id="dataNascimentoPort" name="dataNascimento">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="bancoOrigem" class="form-label">Banco Atual</label>
+                            <input type="text" class="form-control border-secondary" id="bancoOrigem" name="bancoOrigem" placeholder="Digite o banco atual">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="saldoDevedor" class="form-label">Saldo Devedor</label>
+                            <input type="text" class="form-control border-secondary" id="saldoDevedor" name="saldoDevedor" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="valorParcelaAtual" class="form-label">Valor da Parcela Atual</label>
+                            <input type="text" class="form-control border-secondary" id="valorParcelaAtual" name="valorParcela" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="prazoRestante" class="form-label">Prazo Restante (meses)</label>
+                            <input type="number" class="form-control border-secondary" id="prazoRestante" name="prazoRestante" min="1">
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">SIMULAR PORTABILIDADE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portabilidade Out -->
+        <div class="tab-pane fade" id="portabilidade-out" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <form id="portabilidadeOutForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="cpfPortOut" class="form-label">CPF</label>
+                            <input type="text" class="form-control border-secondary" id="cpfPortOut" name="cpf" placeholder="Digite o CPF">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dataNascimentoPortOut" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control border-secondary" id="dataNascimentoPortOut" name="dataNascimento">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="bancoDestino" class="form-label">Banco Destino</label>
+                            <input type="text" class="form-control border-secondary" id="bancoDestino" name="bancoDestino" placeholder="Digite o banco destino">
+                        </div>
+
+                        <div id="contratosContainer">
+                            <!-- Contract items will be added here -->
+                        </div>
+
+                        <div class="col-12">
+                            <button type="button" class="btn btn-secondary" id="addContratoBtn">
+                                <i class="fas fa-plus"></i> Adicionar Contrato
+                            </button>
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">SIMULAR PORTABILIDADE OUT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refinanciamento -->
+        <div class="tab-pane fade" id="refinanciamento" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <form id="refinanciamentoForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="cpfRefin" class="form-label">CPF</label>
+                            <input type="text" class="form-control border-secondary" id="cpfRefin" name="cpf" placeholder="Digite o CPF">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dataNascimentoRefin" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control border-secondary" id="dataNascimentoRefin" name="dataNascimento">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="saldoDevedorRefin" class="form-label">Saldo Devedor Atual</label>
+                            <input type="text" class="form-control border-secondary" id="saldoDevedorRefin" name="saldoDevedor" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="valorParcelaRefin" class="form-label">Valor da Parcela Atual</label>
+                            <input type="text" class="form-control border-secondary" id="valorParcelaRefin" name="valorParcela" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="prazoRestanteRefin" class="form-label">Prazo Restante (meses)</label>
+                            <input type="number" class="form-control border-secondary" id="prazoRestanteRefin" name="prazoRestante" min="1">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="valorNovoEmprestimo" class="form-label">Valor Adicional Desejado</label>
+                            <input type="text" class="form-control border-secondary" id="valorNovoEmprestimo" name="valorNovoEmprestimo" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">SIMULAR REFINANCIAMENTO</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultado da Simulação (inicialmente oculto) -->
+    <div id="resultadoSimulacao" class="mt-4" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Resultado da Simulação</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Valor Aprovado</h6>
+                                <h4 class="card-title" id="valorAprovado">R$ 0,00</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Valor da Parcela</h6>
+                                <h4 class="card-title" id="valorParcela">R$ 0,00</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-secondary">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Taxa de Juros</h6>
+                                <h4 class="card-title" id="taxaJuros">0,00%</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3" id="economiaContainer" style="display: none;">
+                        <div class="card bg-success">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">Economia Total</h6>
+                                <h4 class="card-title" id="economiaTotal">R$ 0,00</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-success px-4" id="contratarBtn">CONTRATAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Máscaras para inputs
+        $('.cpf').mask('000.000.000-00');
+        $('.money').mask('000.000.000,00', {reverse: true});
+        
+        // Aplicar máscaras específicas
+        $('#cpf, #cpfPort, #cpfRefin').mask('000.000.000-00');
+        $('#renda, #valorEmprestimo, #saldoDevedor, #valorParcelaAtual, #saldoDevedorRefin, #valorParcelaRefin, #valorNovoEmprestimo').mask('000.000.000,00', {reverse: true});
+
+        let currentOperation = 'novo';
+        let lastSimulationData = null;
+
+        // Manipulação das tabs
+        $('#operationTabs button').on('click', function (e) {
+            currentOperation = $(this).attr('id').replace('-tab', '');
+            $('#resultadoSimulacao').hide();
+        });
+
+        // Função para formatar valores monetários
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        // Função para processar resultado da simulação
+        function processarResultadoSimulacao(response, tipo) {
+            $('#valorAprovado').text(formatarMoeda(response.valorAprovado || response.valorPortabilidade || response.valorRefinanciamento));
+            $('#valorParcela').text(formatarMoeda(response.valorParcela || response.novaParcela));
+            $('#taxaJuros').text(response.taxaJuros.toFixed(2) + '%');
+            
+            if (tipo === 'portabilidade') {
+                $('#economiaContainer').show();
+                $('#economiaTotal').text(formatarMoeda(response.economiaTotal));
+            } else {
+                $('#economiaContainer').hide();
+            }
+            
+            $('#resultadoSimulacao').show();
+            lastSimulationData = {
+                tipo: tipo,
+                data: response
+            };
+        }
+
+        // Novo Empréstimo
+        $('#novoEmprestimoForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                cpf: $('#cpf').val().replace(/[^\d]/g, ''),
+                dataNascimento: $('#dataNascimento').val(),
+                renda: $('#renda').val().replace(/[^\d]/g, ''),
+                valorEmprestimo: $('#valorEmprestimo').val().replace(/[^\d]/g, ''),
+                prazo: $('#prazo').val()
+            };
+
+            $.ajax({
+                url: '/api/simular-inss',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    processarResultadoSimulacao(response, 'novo');
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação. Por favor, tente novamente.');
+                }
+            });
+        });
+
+        // Portabilidade
+        $('#portabilidadeForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                cpf: $('#cpfPort').val().replace(/[^\d]/g, ''),
+                dataNascimento: $('#dataNascimentoPort').val(),
+                prazoRestante: $('#prazoRestante').val(),
+                saldoDevedor: $('#saldoDevedor').val().replace(/[^\d]/g, ''),
+                valorParcela: $('#valorParcelaAtual').val().replace(/[^\d]/g, ''),
+                bancoOrigem: $('#bancoOrigem').val()
+            };
+
+            $.ajax({
+                url: '/api/simular-portabilidade',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    processarResultadoSimulacao(response, 'portabilidade');
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação de portabilidade. Por favor, tente novamente.');
+                }
+            });
+        });
+
+        // Template for contract items
+        let contratoTemplate = `
+            <div class="row g-3 mb-4 contrato-item">
+                <div class="col-md-6">
+                    <label class="form-label">ID do Contrato</label>
+                    <input type="text" class="form-control border-secondary contrato-id" placeholder="Digite o ID do contrato">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Saldo Devedor</label>
+                    <input type="text" class="form-control border-secondary money saldo-devedor" placeholder="R$ 0,00">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Valor da Parcela</label>
+                    <input type="text" class="form-control border-secondary money valor-parcela" placeholder="R$ 0,00">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Prazo Restante (meses)</label>
+                    <input type="number" class="form-control border-secondary prazo-restante" min="1">
+                </div>
+
+                <div class="col-12">
+                    <button type="button" class="btn btn-danger btn-sm remover-contrato">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Add initial contract item
+        $('#contratosContainer').append(contratoTemplate);
+
+        // Add new contract
+        $('#addContratoBtn').on('click', function() {
+            $('#contratosContainer').append(contratoTemplate);
+            $('.money').mask('000.000.000,00', {reverse: true});
+        });
+
+        // Remove contract
+        $(document).on('click', '.remover-contrato', function() {
+            if ($('.contrato-item').length > 1) {
+                $(this).closest('.contrato-item').remove();
+            } else {
+                alert('É necessário manter pelo menos um contrato.');
+            }
+        });
+
+        // Portabilidade Out
+        $('#portabilidadeOutForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            let contratos = [];
+            $('.contrato-item').each(function() {
+                contratos.push({
+                    contratoId: $(this).find('.contrato-id').val(),
+                    saldoDevedor: $(this).find('.saldo-devedor').val().replace(/[^\d]/g, ''),
+                    valorParcela: $(this).find('.valor-parcela').val().replace(/[^\d]/g, ''),
+                    prazoRestante: parseInt($(this).find('.prazo-restante').val())
+                });
+            });
+
+            const formData = {
+                cpf: $('#cpfPortOut').val().replace(/[^\d]/g, ''),
+                dataNascimento: $('#dataNascimentoPortOut').val(),
+                bancoDestino: $('#bancoDestino').val(),
+                contratos: contratos
+            };
+
+            $.ajax({
+                url: '/api/simular-portabilidade-out',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    let totalPortabilidade = 0;
+                    response.contratos.forEach(contrato => {
+                        totalPortabilidade += parseFloat(contrato.valor_portabilidade);
+                    });
+
+                    $('#valorAprovado').text(formatarMoeda(totalPortabilidade));
+                    $('#valorParcela').text('N/A');
+                    $('#taxaJuros').text('N/A');
+                    $('#economiaContainer').hide();
+                    $('#resultadoSimulacao').show();
+
+                    lastSimulationData = {
+                        tipo: 'portabilidade_out',
+                        data: response
+                    };
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação de portabilidade out. Por favor, tente novamente.');
+                }
+            });
+        });
+
+        // Refinanciamento
+        $('#refinanciamentoForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                cpf: $('#cpfRefin').val().replace(/[^\d]/g, ''),
+                dataNascimento: $('#dataNascimentoRefin').val(),
+                prazoRestante: $('#prazoRestanteRefin').val(),
+                saldoDevedor: $('#saldoDevedorRefin').val().replace(/[^\d]/g, ''),
+                valorParcela: $('#valorParcelaRefin').val().replace(/[^\d]/g, ''),
+                valorNovoEmprestimo: $('#valorNovoEmprestimo').val().replace(/[^\d]/g, '')
+            };
+
+            $.ajax({
+                url: '/api/simular-refinanciamento',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    processarResultadoSimulacao(response, 'refinanciamento');
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação de refinanciamento. Por favor, tente novamente.');
+                }
+            });
+        });
+
+        // Contratação
+        $('#contratarBtn').on('click', function() {
+            if (!lastSimulationData) {
+                alert('Por favor, realize uma simulação primeiro.');
+                return;
+            }
+
+            let endpoint;
+            let formData;
+
+            switch (lastSimulationData.tipo) {
+                case 'novo':
+                    endpoint = '/api/contratar-inss';
+                    formData = {
+                        cpf: $('#cpf').val().replace(/[^\d]/g, ''),
+                        dataNascimento: $('#dataNascimento').val(),
+                        renda: $('#renda').val().replace(/[^\d]/g, ''),
+                        valorEmprestimo: $('#valorEmprestimo').val().replace(/[^\d]/g, ''),
+                        prazo: $('#prazo').val()
+                    };
+                    break;
+
+                case 'portabilidade':
+                    endpoint = '/api/contratar-portabilidade';
+                    formData = {
+                        cpf: $('#cpfPort').val().replace(/[^\d]/g, ''),
+                        dataNascimento: $('#dataNascimentoPort').val(),
+                        prazoRestante: $('#prazoRestante').val(),
+                        saldoDevedor: $('#saldoDevedor').val().replace(/[^\d]/g, ''),
+                        valorParcela: $('#valorParcelaAtual').val().replace(/[^\d]/g, ''),
+                        bancoOrigem: $('#bancoOrigem').val()
+                    };
+                    break;
+
+                case 'portabilidade_out':
+                    endpoint = '/api/contratar-portabilidade-out';
+                    let contratos = [];
+                    $('.contrato-item').each(function() {
+                        contratos.push({
+                            contratoId: $(this).find('.contrato-id').val(),
+                            saldoDevedor: $(this).find('.saldo-devedor').val().replace(/[^\d]/g, ''),
+                            valorParcela: $(this).find('.valor-parcela').val().replace(/[^\d]/g, ''),
+                            prazoRestante: parseInt($(this).find('.prazo-restante').val())
+                        });
+                    });
+                    
+                    formData = {
+                        cpf: $('#cpfPortOut').val().replace(/[^\d]/g, ''),
+                        dataNascimento: $('#dataNascimentoPortOut').val(),
+                        bancoDestino: $('#bancoDestino').val(),
+                        contratos: contratos
+                    };
+                    break;
+
+                case 'refinanciamento':
+                    endpoint = '/api/contratar-refinanciamento';
+                    formData = {
+                        cpf: $('#cpfRefin').val().replace(/[^\d]/g, ''),
+                        dataNascimento: $('#dataNascimentoRefin').val(),
+                        prazoRestante: $('#prazoRestanteRefin').val(),
+                        saldoDevedor: $('#saldoDevedorRefin').val().replace(/[^\d]/g, ''),
+                        valorParcela: $('#valorParcelaRefin').val().replace(/[^\d]/g, ''),
+                        valorNovoEmprestimo: $('#valorNovoEmprestimo').val().replace(/[^\d]/g, '')
+                    };
+                    break;
+            }
+
+            $.ajax({
+                url: endpoint,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert('Proposta enviada com sucesso! Em breve entraremos em contato.');
+                    // Opcional: Iniciar polling do status da proposta
+                    if (response.proposal_id) {
+                        iniciarPollingStatus(response.proposal_id);
+                    }
+                },
+                error: function(xhr) {
+                    alert('Erro ao enviar proposta. Por favor, tente novamente.');
+                }
+            });
+        });
+
+        // Função para verificar o status da proposta
+        function verificarStatusProposta(proposalId) {
+            $.ajax({
+                url: `/api/status-proposta/${proposalId}`,
+                method: 'GET',
+                success: function(response) {
+                    console.log('Status da proposta:', response.status);
+                    // Aqui você pode adicionar lógica para atualizar a interface com o status
+                },
+                error: function(xhr) {
+                    console.error('Erro ao verificar status da proposta');
+                }
+            });
+        }
+
+        // Função para iniciar o polling do status da proposta
+        function iniciarPollingStatus(proposalId) {
+            // Verifica o status a cada 30 segundos
+            const interval = setInterval(function() {
+                verificarStatusProposta(proposalId);
+            }, 30000);
+
+            // Para o polling após 5 minutos
+            setTimeout(function() {
+                clearInterval(interval);
+            }, 300000);
+        }
+
+        // Handle direct tab access from URL hash
+        let hash = window.location.hash;
+        if (hash) {
+            let tabId = hash.replace('#', '') + '-tab';
+            if ($('#' + tabId).length) {
+                $('#' + tabId).tab('show');
+            }
+        }
+
+        // Update URL hash when tab changes
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            let id = $(e.target).attr('data-bs-target').replace('#', '');
+            history.replaceState(null, null, '#' + id);
+        });
+    });
+</script>
+{% endblock %}

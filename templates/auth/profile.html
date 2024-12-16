@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Perfil{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-5">
+                <div class="card-body p-5">
+                    <h2 class="mb-4">Perfil do Usuário</h2>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Nome:</strong> {{ current_user.name }}</p>
+                            <p><strong>Email:</strong> {{ current_user.email }}</p>
+                            <p><strong>Função:</strong> {{ current_user.role }}</p>
+                            <p><strong>Status:</strong> {{ current_user.status }}</p>
+                            <p><strong>Último login:</strong> {{ current_user.last_login.strftime('%d/%m/%Y %H:%M') if current_user.last_login else 'N/A' }}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3">Alterar Senha</h4>
+                    <form method="POST" action="{{ url_for('auth.update_password') }}" class="mb-4">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Senha Atual</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                    </form>
+                    
+                    <h4 class="mb-3">Atividade Recente</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Ação</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in audit_logs %}
+                                <tr>
+                                    <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>{{ log.action }}</td>
+                                    <td>{{ log.ip_address }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

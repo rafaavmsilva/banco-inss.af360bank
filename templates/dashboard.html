@@ -3,21 +3,54 @@
 {% block title %}NE Pay - Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2>Dashboard</h2>
-        </div>
+<div class="content-container">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <!-- Form Container -->
+    <div class="dark-container">
+        <form id="loan-form" class="row g-3">
+            <div class="col-md-6">
+                <label for="cpf" class="form-label">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" required>
+            </div>
+            <div class="col-md-6">
+                <label for="birthdate" class="form-label">Data de Nascimento</label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+            </div>
+            <div class="col-md-6">
+                <label for="income" class="form-label">Renda Mensal</label>
+                <input type="number" class="form-control" id="income" name="income" required>
+            </div>
+            <div class="col-md-6">
+                <label for="loan_amount" class="form-label">Valor Desejado</label>
+                <input type="number" class="form-control" id="loan_amount" name="loan_amount" required>
+            </div>
+            <div class="col-md-6">
+                <label for="term" class="form-label">Prazo (meses)</label>
+                <select class="form-control" id="term" name="term" required>
+                    <option value="12">12 meses</option>
+                    <option value="24">24 meses</option>
+                    <option value="36">36 meses</option>
+                    <option value="48">48 meses</option>
+                    <option value="60">60 meses</option>
+                    <option value="72">72 meses</option>
+                    <option value="84">84 meses</option>
+                </select>
+            </div>
+            <div class="col-12 text-end mt-4">
+                <button type="submit" class="btn btn-simular">Simular</button>
+            </div>
+        </form>
     </div>
 
-    <!-- Cards de Resumo -->
-    <div class="row mb-4">
+    <!-- Summary Cards -->
+    <div class="row mt-4">
         <div class="col-md-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Total de Propostas</h5>
-                    <h2 class="card-text">{{ total_propostas }}</h2>
-                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                    <h5 class="card-title">Total de Propostas INSS</h5>
+                    <p class="card-subtitle mb-2">Últimos 30 dias</p>
+                    <h2 class="mt-3 mb-0">{{ total_propostas }}</h2>
                 </div>
             </div>
         </div>
@@ -25,17 +58,17 @@
             <div class="card bg-success text-white">
                 <div class="card-body">
                     <h5 class="card-title">Propostas Aprovadas</h5>
-                    <h2 class="card-text">{{ propostas_aprovadas }}</h2>
-                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                    <p class="card-subtitle mb-2">Últimos 30 dias</p>
+                    <h2 class="mt-3 mb-0">{{ propostas_aprovadas }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white">
+            <div class="card bg-warning">
                 <div class="card-body">
                     <h5 class="card-title">Em Análise</h5>
-                    <h2 class="card-text">{{ propostas_analise }}</h2>
-                    <p class="card-text"><small>Atualmente</small></p>
+                    <p class="card-subtitle mb-2">Atualmente</p>
+                    <h2 class="mt-3 mb-0">{{ propostas_analise }}</h2>
                 </div>
             </div>
         </div>
@@ -43,74 +76,118 @@
             <div class="card bg-danger text-white">
                 <div class="card-body">
                     <h5 class="card-title">Propostas Recusadas</h5>
-                    <h2 class="card-text">{{ propostas_recusadas }}</h2>
-                    <p class="card-text"><small>Últimos 30 dias</small></p>
+                    <p class="card-subtitle mb-2">Últimos 30 dias</p>
+                    <h2 class="mt-3 mb-0">{{ propostas_recusadas }}</h2>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Charts Row -->
     <div class="row mb-4">
-        <div class="col-12 text-end">
-            <a href="/esteira-propostas" class="btn btn-success">
-                <i class="fas fa-list me-2"></i>Esteira de Propostas
-            </a>
-        </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Propostas por Status</h5>
+                    <h5 class="card-title">Propostas INSS por Status</h5>
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Volume de Propostas</h5>
+                    <h5 class="card-title">Volume de Propostas INSS</h5>
                     <canvas id="volumeChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Últimas Propostas -->
-    <div class="row">
+    <!-- Latest Proposals Table -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Últimas Propostas INSS</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID Proposta</th>
+                            <th>CPF</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proposta in ultimas_propostas %}
+                        <tr>
+                            <td>{{ proposta.proposal_id }}</td>
+                            <td>{{ proposta.cpf }}</td>
+                            <td>{{ proposta.proposal_type }}</td>
+                            <td>
+                                <span class="badge {% if proposta.status == 'approved' %}bg-success{% elif proposta.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ proposta.status }}
+                                </span>
+                            </td>
+                            <td>{{ proposta.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="summary-card">
+                <h3>Propostas Pendentes</h3>
+                <p class="number">{{ pending_count }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <h3>Propostas Aprovadas</h3>
+                <p class="number">{{ approved_count }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <h3>Propostas Rejeitadas</h3>
+                <p class="number">{{ rejected_count }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <h3>Total de Propostas</h3>
+                <p class="number">{{ total_count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
         <div class="col-12">
             <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ações Rápidas</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Últimas Propostas</h5>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>CCB</th>
-                                    <th>Cliente</th>
-                                    <th>Valor</th>
-                                    <th>Status</th>
-                                    <th>Data</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for proposta in ultimas_propostas %}
-                                <tr>
-                                    <td>{{ proposta.ccb }}</td>
-                                    <td>{{ proposta.cliente }}</td>
-                                    <td>R$ {{ proposta.valor }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ proposta.status_class }}">
-                                            {{ proposta.status }}
-                                        </span>
-                                    </td>
-                                    <td>{{ proposta.data }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('inss_novo') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-2"></i>Nova Proposta
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('inss_portabilidade') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-exchange-alt me-2"></i>Portabilidade
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('inss_refinanciamento') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-sync me-2"></i>Refinanciamento
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,37 +199,39 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfico de Status
+    // Status Chart
     const statusCtx = document.getElementById('statusChart').getContext('2d');
     new Chart(statusCtx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
             labels: ['Aprovadas', 'Em Análise', 'Recusadas'],
             datasets: [{
                 data: [{{ propostas_aprovadas }}, {{ propostas_analise }}, {{ propostas_recusadas }}],
-                backgroundColor: [
-                    '#28a745',
-                    '#ffc107',
-                    '#dc3545',
-                ]
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545']
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 
-    // Gráfico de Volume
+    // Volume Chart
     const volumeCtx = document.getElementById('volumeChart').getContext('2d');
     new Chart(volumeCtx, {
         type: 'line',
         data: {
-            labels: {{ datas_volume|safe }},
+            labels: {{ datas|safe }},
             datasets: [{
                 label: 'Volume de Propostas',
-                data: {{ valores_volume }},
-                borderColor: '#007bff',
-                tension: 0.1,
+                data: {{ volumes|safe }},
+                borderColor: '#4CAF50',
+                tension: 0.4
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true

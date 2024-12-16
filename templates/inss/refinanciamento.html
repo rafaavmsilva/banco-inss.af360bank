@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Refinanciamento INSS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Refinanciamento INSS</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="refinanciamentoForm" class="row g-3">
+                <div class="col-md-6">
+                    <label for="cpf" class="form-label">CPF</label>
+                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Digite o CPF">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+                    <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
+                </div>
+
+                <div id="contratosContainer">
+                    <h5 class="mt-4 mb-3">Contratos para Refinanciamento</h5>
+                    <div class="row g-3 mb-4 contrato-item">
+                        <div class="col-md-6">
+                            <label class="form-label">ID do Contrato</label>
+                            <input type="text" class="form-control contrato-id" placeholder="Digite o ID do contrato">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Saldo Devedor</label>
+                            <input type="text" class="form-control money saldo-devedor" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Valor da Parcela Atual</label>
+                            <input type="text" class="form-control money valor-parcela" placeholder="R$ 0,00">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Prazo Restante (meses)</label>
+                            <input type="number" class="form-control prazo-restante" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button type="button" id="adicionarContratoBtn" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> Adicionar Contrato
+                    </button>
+                </div>
+
+                <div class="col-md-6 mt-4">
+                    <label for="valorAdicional" class="form-label">Valor Adicional Desejado</label>
+                    <input type="text" class="form-control money" id="valorAdicional" name="valorAdicional" placeholder="R$ 0,00">
+                </div>
+
+                <div class="col-md-6 mt-4">
+                    <label for="novoPrazo" class="form-label">Novo Prazo Desejado</label>
+                    <select class="form-select" id="novoPrazo" name="novoPrazo">
+                        <option value="12">12 meses</option>
+                        <option value="24">24 meses</option>
+                        <option value="36">36 meses</option>
+                        <option value="48">48 meses</option>
+                        <option value="60">60 meses</option>
+                        <option value="72">72 meses</option>
+                        <option value="84">84 meses</option>
+                    </select>
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary">SIMULAR REFINANCIAMENTO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultado da Simulação -->
+    <div id="resultadoSimulacao" class="mt-4" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Resultado da Simulação</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="mb-1">Valor Total Refinanciado</p>
+                        <h4 id="valorTotal">R$ 0,00</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1">Nova Parcela</p>
+                        <h4 id="novaParcela">R$ 0,00</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1">Taxa de Juros</p>
+                        <h4 id="taxaJuros">0,00%</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1">Economia Mensal</p>
+                        <h4 id="economiaMensal">R$ 0,00</h4>
+                    </div>
+                </div>
+                <div class="text-end mt-4">
+                    <button id="contratarBtn" class="btn btn-success">CONTRATAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Form submission
+        $('#refinanciamentoForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            let contratos = [];
+            $('.contrato-item').each(function() {
+                contratos.push({
+                    id: $(this).find('.contrato-id').val(),
+                    saldoDevedor: $(this).find('.saldo-devedor').val().replace(/[^\d]/g, ''),
+                    valorParcela: $(this).find('.valor-parcela').val().replace(/[^\d]/g, ''),
+                    prazoRestante: $(this).find('.prazo-restante').val()
+                });
+            });
+
+            $.ajax({
+                url: '/api/simular-refinanciamento',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    cpf: $('#cpf').val(),
+                    dataNascimento: $('#dataNascimento').val(),
+                    contratos: contratos,
+                    valorAdicional: $('#valorAdicional').val().replace(/[^\d]/g, ''),
+                    novoPrazo: $('#novoPrazo').val()
+                }),
+                success: function(response) {
+                    $('#valorTotal').text(formatarMoeda(response.valorTotal));
+                    $('#novaParcela').text(formatarMoeda(response.novaParcela));
+                    $('#taxaJuros').text(response.taxaJuros.toFixed(2) + '%');
+                    $('#economiaMensal').text(formatarMoeda(response.economiaMensal));
+                    $('#resultadoSimulacao').show();
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação');
+                }
+            });
+        });
+
+        // Add new contract
+        $('#adicionarContratoBtn').click(function() {
+            let novoContrato = $('.contrato-item').first().clone();
+            novoContrato.find('input').val('');
+            $('#contratosContainer').append(novoContrato);
+            $('.money').mask('#.##0,00', { reverse: true });
+        });
+
+        // Initialize money mask
+        $('.money').mask('#.##0,00', { reverse: true });
+    });
+</script>
+{% endblock %}

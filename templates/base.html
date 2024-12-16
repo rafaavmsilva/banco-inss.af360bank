@@ -3,143 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}NE Pay - Dashboard{% endblock %}</title>
+    <title>{% block title %}Dashboard{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            background-color: #1a1a1a;
-            color: white;
-            min-height: 100vh;
-            padding-top: 20px;
-            width: 250px;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-        .nav-item {
-            width: 100%;
-        }
-        .nav-link {
-            color: white !important;
-            padding: 10px 15px !important;
-            display: flex !important;
-            align-items: center;
-            text-decoration: none;
-        }
-        .nav-link:hover {
-            background-color: #333;
-        }
-        .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-        }
-        .submenu {
-            list-style: none;
-            padding-left: 0;
-            display: none;
-        }
-        .submenu.show {
-            display: block;
-        }
-        .submenu .nav-link {
-            padding-left: 45px !important;
-        }
-        .menu-item {
-            position: relative;
-            width: 100%;
-        }
-        .menu-item.active .submenu {
-            display: block;
-        }
-        .menu-item > .nav-link {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center;
-        }
-        .menu-item > .nav-link::after {
-            content: '\f107';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            transition: transform 0.3s;
-        }
-        .menu-item.active > .nav-link::after {
-            transform: rotate(180deg);
-        }
-        .active-item {
-            color: #00ff9d !important;
-            position: relative;
-        }
-        .active-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background-color: #00ff9d;
-        }
-        .sair-btn {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            padding: 10px 15px;
-        }
-        .sair-btn .nav-link {
-            color: #ff4444 !important;
-        }
-    </style>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="wrapper">
         <!-- Sidebar -->
         <nav class="sidebar">
-            <div class="d-flex align-items-center mb-4 px-3">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="NE Pay" height="40">
-            </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a href="/dashboard" class="nav-link">
+                    <a href="/" class="nav-link {% if request.endpoint == 'index' %}active-item{% endif %}">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="#" class="nav-link">
-                        <span><i class="fas fa-file-alt"></i> Propostas</span>
+                <li class="nav-item menu-item {% if 'inss' in request.endpoint %}active{% endif %}">
+                    <a href="#inssSubmenu" class="nav-link" data-bs-toggle="collapse">
+                        <i class="fas fa-file-alt"></i> INSS
+                        <i class="fas fa-chevron-down ms-auto"></i>
                     </a>
-                    <ul class="submenu">
-                        <li><a href="/esteira-propostas" class="nav-link active-item">Esteira de propostas</a></li>
-                        <li><a href="/pagamento-comissoes" class="nav-link">Pagamento de comissões</a></li>
-                        <li><a href="/fgts" class="nav-link">FGTS</a></li>
-                        <li><a href="/credito-pessoal" class="nav-link">Crédito Pessoal</a></li>
-                        <li><a href="/capital-giro" class="nav-link">Capital de Giro</a></li>
+                    <ul class="collapse submenu {% if 'inss' in request.endpoint %}show{% endif %}" id="inssSubmenu">
+                        <li>
+                            <a href="/inss/novo" class="nav-link {% if request.endpoint == 'inss_novo' %}active-item{% endif %}">
+                                <i class="fas fa-plus-circle"></i> Novo Empréstimo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/inss/portabilidade" class="nav-link {% if request.endpoint == 'inss_portabilidade' %}active-item{% endif %}">
+                                <i class="fas fa-exchange-alt"></i> Portabilidade
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/inss/portabilidade-out" class="nav-link {% if request.endpoint == 'inss_portabilidade_out' %}active-item{% endif %}">
+                                <i class="fas fa-sign-out-alt"></i> Portabilidade Out
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/inss/refinanciamento" class="nav-link {% if request.endpoint == 'inss_refinanciamento' %}active-item{% endif %}">
+                                <i class="fas fa-sync"></i> Refinanciamento
+                            </a>
+                        </li>
                     </ul>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="nav-link">
-                        <span><i class="fas fa-cogs"></i> Administração</span>
-                    </a>
-                    <ul class="submenu">
-                        <li><a href="/usuarios" class="nav-link">Usuários</a></li>
-                        <li><a href="/perfis" class="nav-link">Perfis</a></li>
-                        <li><a href="/parceiros" class="nav-link">Parceiros</a></li>
-                        <li><a href="/tabelas" class="nav-link">Tabelas</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="/configuracoes" class="nav-link">
-                        <i class="fas fa-cog"></i> Configurações
-                    </a>
                 </li>
             </ul>
-            <div class="sair-btn">
-                <a href="/logout" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> SAIR
-                </a>
+            <div class="logo-bottom">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="NE Pay Logo" style="width: 150px; height: auto;">
             </div>
         </nav>
 
@@ -149,28 +58,17 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Toggle submenu
-            $('.menu-item > .nav-link').click(function(e) {
-                e.preventDefault();
-                const menuItem = $(this).parent();
-                menuItem.toggleClass('active');
-                
-                // Close other open menus
-                $('.menu-item').not(menuItem).removeClass('active');
-            });
-
-            // Set active menu based on current page
-            const currentPath = window.location.pathname;
-            $('.submenu a').each(function() {
-                if ($(this).attr('href') === currentPath) {
-                    $(this).addClass('active-item');
-                    $(this).closest('.menu-item').addClass('active');
-                }
-            });
+        // Initialize all collapse elements
+        document.addEventListener('DOMContentLoaded', function() {
+            var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'))
+            var collapseList = collapseElementList.map(function(collapseEl) {
+                return new bootstrap.Collapse(collapseEl, {
+                    toggle: false
+                })
+            })
         });
     </script>
     {% block scripts %}{% endblock %}

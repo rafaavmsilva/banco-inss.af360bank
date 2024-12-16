@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}NE Pay - Novo Empréstimo INSS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Novo Empréstimo INSS</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="novoEmprestimoForm" class="row g-3">
+                <div class="col-md-6">
+                    <label for="cpf" class="form-label">CPF</label>
+                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Digite o CPF">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+                    <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="renda" class="form-label">Renda Mensal</label>
+                    <input type="text" class="form-control" id="renda" name="renda" placeholder="R$ 0,00">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="valorEmprestimo" class="form-label">Valor Desejado</label>
+                    <input type="text" class="form-control" id="valorEmprestimo" name="valorEmprestimo" placeholder="R$ 0,00">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="prazo" class="form-label">Prazo (meses)</label>
+                    <select class="form-select" id="prazo" name="prazo">
+                        <option value="12">12 meses</option>
+                        <option value="24">24 meses</option>
+                        <option value="36">36 meses</option>
+                        <option value="48">48 meses</option>
+                        <option value="60">60 meses</option>
+                        <option value="72">72 meses</option>
+                        <option value="84">84 meses</option>
+                    </select>
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary">SIMULAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultado da Simulação -->
+    <div id="resultadoSimulacao" class="mt-4" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Resultado da Simulação</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="mb-1">Valor Aprovado</p>
+                        <h4 id="valorAprovado">R$ 0,00</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1">Valor da Parcela</p>
+                        <h4 id="valorParcela">R$ 0,00</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1">Taxa de Juros</p>
+                        <h4 id="taxaJuros">0,00%</h4>
+                    </div>
+                </div>
+                <div class="text-end mt-4">
+                    <button id="contratarBtn" class="btn btn-success">CONTRATAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Form submission
+        $('#novoEmprestimoForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/api/simular-inss',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    cpf: $('#cpf').val(),
+                    dataNascimento: $('#dataNascimento').val(),
+                    renda: $('#renda').val().replace(/[^\d]/g, ''),
+                    valorEmprestimo: $('#valorEmprestimo').val().replace(/[^\d]/g, ''),
+                    prazo: $('#prazo').val()
+                }),
+                success: function(response) {
+                    $('#valorAprovado').text(formatarMoeda(response.valorAprovado));
+                    $('#valorParcela').text(formatarMoeda(response.valorParcela));
+                    $('#taxaJuros').text(response.taxaJuros.toFixed(2) + '%');
+                    $('#resultadoSimulacao').show();
+                },
+                error: function(xhr) {
+                    alert('Erro ao realizar simulação');
+                }
+            });
+        });
+
+        // Money formatting
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor / 100);
+        }
+
+        // Initialize money mask
+        $('.money').mask('#.##0,00', { reverse: true });
+    });
+</script>
+{% endblock %}
