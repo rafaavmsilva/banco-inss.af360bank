@@ -1,108 +1,31 @@
 {% extends "base.html" %}
-
-{% block title %}AF BANK - Refinanciamento INSS{% endblock %}
+{% block title %}Refinanciamento INSS{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h2 class="mb-4">Refinanciamento INSS</h2>
-
-    <div class="card">
-        <div class="card-body">
-            <form id="refinanciamentoForm" class="row g-3">
-                <div class="col-md-6">
-                    <label for="cpf" class="form-label">CPF</label>
-                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Digite o CPF">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="dataNascimento" class="form-label">Data de Nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
-                </div>
-
-                <div id="contratosContainer">
-                    <h5 class="mt-4 mb-3">Contratos para Refinanciamento</h5>
-                    <div class="row g-3 mb-4 contrato-item">
-                        <div class="col-md-6">
-                            <label class="form-label">ID do Contrato</label>
-                            <input type="text" class="form-control contrato-id" placeholder="Digite o ID do contrato">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Saldo Devedor</label>
-                            <input type="text" class="form-control money saldo-devedor" placeholder="R$ 0,00">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Valor da Parcela Atual</label>
-                            <input type="text" class="form-control money valor-parcela" placeholder="R$ 0,00">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Prazo Restante (meses)</label>
-                            <input type="number" class="form-control prazo-restante" min="1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <button type="button" id="adicionarContratoBtn" class="btn btn-outline-primary">
-                        <i class="fas fa-plus"></i> Adicionar Contrato
-                    </button>
-                </div>
-
-                <div class="col-md-6 mt-4">
-                    <label for="valorAdicional" class="form-label">Valor Adicional Desejado</label>
-                    <input type="text" class="form-control money" id="valorAdicional" name="valorAdicional" placeholder="R$ 0,00">
-                </div>
-
-                <div class="col-md-6 mt-4">
-                    <label for="novoPrazo" class="form-label">Novo Prazo Desejado</label>
-                    <select class="form-select" id="novoPrazo" name="novoPrazo">
-                        <option value="12">12 meses</option>
-                        <option value="24">24 meses</option>
-                        <option value="36">36 meses</option>
-                        <option value="48">48 meses</option>
-                        <option value="60">60 meses</option>
-                        <option value="72">72 meses</option>
-                        <option value="84">84 meses</option>
-                    </select>
-                </div>
-
-                <div class="col-12 text-end mt-4">
-                    <button type="submit" class="btn btn-primary">SIMULAR REFINANCIAMENTO</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Resultado da Simulação -->
-    <div id="resultadoSimulacao" class="mt-4" style="display: none;">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Resultado da Simulação</h5>
-                <div class="row">
-                    <div class="col-md-3">
-                        <p class="mb-1">Valor Total Refinanciado</p>
-                        <h4 id="valorTotal">R$ 0,00</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1">Nova Parcela</p>
-                        <h4 id="novaParcela">R$ 0,00</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1">Taxa de Juros</p>
-                        <h4 id="taxaJuros">0,00%</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1">Economia Mensal</p>
-                        <h4 id="economiaMensal">R$ 0,00</h4>
-                    </div>
-                </div>
-                <div class="text-end mt-4">
-                    <button id="contratarBtn" class="btn btn-success">CONTRATAR</button>
-                </div>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Refinanciamento de Empréstimo INSS</h2>
+        <form id="refinanciamentoForm" class="mt-4">
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
             </div>
-        </div>
+            <div class="mb-3">
+                <label for="current_installment" class="form-label">Valor Atual da Parcela</label>
+                <input type="currency" class="form-control" id="current_installment" name="current_installment" required>
+            </div>
+            <div class="mb-3">
+                <label for="new_installments" class="form-label">Novas Parcelas</label>
+                <select class="form-control" id="new_installments" name="new_installments" required>
+                    <option value="">Selecione</option>
+                    {% for i in range(12, 85, 12) %}
+                    <option value="{{ i }}">{{ i }}x</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Simular Refinanciamento</button>
+        </form>
+        <div id="refinanciamentoResult" class="mt-4"></div>
     </div>
 </div>
 {% endblock %}

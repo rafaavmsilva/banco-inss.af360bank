@@ -1,65 +1,22 @@
 {% extends "base.html" %}
-
-{% block title %}AF BANK - Portabilidade Out INSS{% endblock %}
+{% block title %}Portabilidade OUT INSS{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h2 class="mb-4">Portabilidade Out INSS</h2>
-
-    <div class="card">
-        <div class="card-body">
-            <form id="portabilidadeOutForm" class="row g-3">
-                <div class="col-md-6">
-                    <label for="cpf" class="form-label">CPF</label>
-                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Digite o CPF">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="dataNascimento" class="form-label">Data de Nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="bancoDestino" class="form-label">Banco Destino</label>
-                    <input type="text" class="form-control" id="bancoDestino" name="bancoDestino" placeholder="Digite o banco destino">
-                </div>
-
-                <div id="contratosContainer">
-                    <h5 class="mt-4 mb-3">Contratos</h5>
-                    <div class="row g-3 mb-4 contrato-item">
-                        <div class="col-md-6">
-                            <label class="form-label">ID do Contrato</label>
-                            <input type="text" class="form-control contrato-id" placeholder="Digite o ID do contrato">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Saldo Devedor</label>
-                            <input type="text" class="form-control money saldo-devedor" placeholder="R$ 0,00">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Valor da Parcela</label>
-                            <input type="text" class="form-control money valor-parcela" placeholder="R$ 0,00">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Prazo Restante (meses)</label>
-                            <input type="number" class="form-control prazo-restante" min="1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <button type="button" id="adicionarContratoBtn" class="btn btn-outline-primary">
-                        <i class="fas fa-plus"></i> Adicionar Contrato
-                    </button>
-                </div>
-
-                <div class="col-12 text-end mt-4">
-                    <button type="submit" class="btn btn-primary">SOLICITAR PORTABILIDADE</button>
-                </div>
-            </form>
-        </div>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Solicitar Portabilidade OUT</h2>
+        <form id="portabilidadeOutForm" class="mt-4">
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
+            </div>
+            <div class="mb-3">
+                <label for="contract_number" class="form-label">Número do Contrato</label>
+                <input type="text" class="form-control" id="contract_number" name="contract_number" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Solicitar Portabilidade</button>
+        </form>
+        <div id="portabilidadeOutResult" class="mt-4"></div>
     </div>
 </div>
 {% endblock %}
