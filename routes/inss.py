@@ -118,6 +118,7 @@ def solicitar_portabilidade_out():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+# Change this line in routes/inss.py
 @bp.route('/api/simular-refinanciamento', methods=['POST', 'OPTIONS'])
 def simular_refinanciamento():
     if request.method == 'OPTIONS':

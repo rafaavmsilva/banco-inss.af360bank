@@ -1,10 +1,10 @@
 // Constants
-const BASE_URL = 'https://banco-af360bank.onrender.com';
+const BASE_URL = window.location.origin;
 const API_ENDPOINTS = {
     SIMULAR_INSS: '/inss/api/simular',
     SIMULAR_PORTABILIDADE: '/inss/api/simular-portabilidade',
     SOLICITAR_PORTABILIDADE: '/inss/api/solicitar-portabilidade-out',
-    SIMULAR_REFINANCIAMENTO: '/inss/api/simular-refinanciamento'
+    SIMULAR_REFINANCIAMENTO: '/inss/api/simular-refinanciamento'  // Update this endpoint
 };
 
 // Utility Functions
@@ -21,7 +21,7 @@ function handleNovoEmprestimo() {
         e.preventDefault();
         
         $.ajax({
-            url: API_ENDPOINTS.SIMULAR_INSS,
+            url: BASE_URL + API_ENDPOINTS.SIMULAR_INSS,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
