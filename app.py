@@ -146,8 +146,78 @@ def create_app():
 
         return jsonify(mock_response), 200
 
-    return app
+    # In app.py, modify the route from '/inss/novo' to '/api/simular-inss'
 
+@app.route('/api/simular-inss', methods=['POST'])
+def simular_inss():
+    try:
+        data = request.json
+
+        # Validate required fields
+        required_fields = ['cpf', 'salary', 'loan_amount', 'installments']
+        if not all(field in data for field in required_fields):
+            return jsonify({
+                "error": "Missing required fields",
+                "required_fields": required_fields
+            }), 400
+
+        # Extract data from the frontend format
+        cpf = data.get('cpf', '').replace('.', '').replace('-', '')
+        salary = float(data.get('salary', 0))
+        loan_amount = float(data.get('loan_amount', 0))
+        installments = int(data.get('installments', 0))
+
+        # CPF validation
+        if not validate_cpf(cpf):
+            return jsonify({"error": "CPF inválido"}), 400
+
+        # Basic data validation
+        if salary <= 0 or loan_amount <= 0 or installments <= 0:
+            return jsonify({"error": "Valores inválidos para salário, valor do empréstimo ou parcelas"}), 400
+
+        # Get credit score
+        credit_score = calculate_credit_score(cpf)
+
+        # Calculate loan limit
+        loan_limit = calculate_loan_limit(salary, credit_score)
+
+        if loan_amount > loan_limit:
+            return jsonify({
+                "error": "Valor do empréstimo excede o limite disponível",
+                "available_limit": loan_limit
+            }), 400
+
+        # Get current interest rate
+        base_rate = get_bcb_interest_rate()
+        
+        # Calculate monthly interest rate (base_rate + spread)
+        monthly_rate = (base_rate + 2) / 12 / 100
+
+        # Calculate monthly payment
+        monthly_payment = (loan_amount * monthly_rate * (1 + monthly_rate)**installments) / ((1 + monthly_rate)**installments - 1)
+
+        # Create simulation response
+        simulation_response = {
+            "success": True,
+            "data": {
+                "proposal_id": f"PROP-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                "monthly_payment": round(monthly_payment, 2),
+                "annual_interest_rate": round(base_rate + 2, 2),
+                "total_amount": round(monthly_payment * installments, 2),
+                "installments": installments,
+                "loan_amount": loan_amount
+            }
+        }
+
+        return jsonify(simulation_response), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+    return app
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)
