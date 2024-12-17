@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 from utils.validators import validate_cpf
 from utils.calculations import calculate_credit_score, calculate_loan_limit, get_bcb_interest_rate
+import logging
+from flask import current_app
 
+# Add this at the top after imports
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 bp = Blueprint('inss', __name__, url_prefix='/inss')
 
 @bp.route('/novo', methods=['GET'])
@@ -27,13 +32,9 @@ def simular_inss():
         return jsonify({}), 200
         
     try:
+        logger.debug(f"Received request data: {request.data}")
         data = request.json
-        required_fields = ['cpf', 'salary', 'loan_amount', 'installments']
-        if not all(field in data for field in required_fields):
-            return jsonify({
-                "error": "Missing required fields",
-                "required_fields": required_fields
-            }), 400
+        logger.info(f"Processing simulation request with data: {data}")
 
         cpf = data.get('cpf', '').replace('.', '').replace('-', '')
         salary = float(data.get('salary', 0))
@@ -74,6 +75,7 @@ def simular_inss():
         return jsonify(simulation_response), 200
 
     except Exception as e:
+        logger.error(f"Error in simular_inss: {str(e)}", exc_info=True)
         return jsonify({
             "success": False,
             "error": str(e)

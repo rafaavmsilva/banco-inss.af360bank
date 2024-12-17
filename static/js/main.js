@@ -1,10 +1,10 @@
 // Constants
 const BASE_URL = window.location.origin;
 const API_ENDPOINTS = {
-    SIMULAR_INSS: '/inss/api/simular',
+    SIMULAR_INSS: '/inss/api/simular',  // Make sure this matches the Flask route
     SIMULAR_PORTABILIDADE: '/inss/api/simular-portabilidade',
     SOLICITAR_PORTABILIDADE: '/inss/api/solicitar-portabilidade-out',
-    SIMULAR_REFINANCIAMENTO: '/inss/api/simular-refinanciamento'  // Update this endpoint
+    SIMULAR_REFINANCIAMENTO: '/inss/api/simular-refinanciamento'
 };
 
 // Utility Functions
@@ -15,22 +15,31 @@ function formatarMoeda(valor) {
     }).format(valor);
 }
 
-// Form Handlers
+function logDebug(message, data) {
+    console.log(`[DEBUG] ${message}`, data);
+}
+
 function handleNovoEmprestimo() {
     $('#inssForm').on('submit', function(e) {
         e.preventDefault();
         
+        const formData = {
+            cpf: $('#cpf').val().replace(/[^\d]/g, ''),
+            salary: parseFloat($('#salary').val().replace(/[^\d,]/g, '').replace(',', '.')),
+            loan_amount: parseFloat($('#loan_amount').val().replace(/[^\d,]/g, '').replace(',', '.')),
+            installments: parseInt($('#installments').val())
+        };
+
+        logDebug('Submitting form with data:', formData);
+        logDebug('Using endpoint:', BASE_URL + API_ENDPOINTS.SIMULAR_INSS);
+
         $.ajax({
             url: BASE_URL + API_ENDPOINTS.SIMULAR_INSS,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                cpf: $('#cpf').val().replace(/[^\d]/g, ''),
-                salary: parseFloat($('#salary').val().replace(/[^\d,]/g, '').replace(',', '.')),
-                loan_amount: parseFloat($('#loan_amount').val().replace(/[^\d,]/g, '').replace(',', '.')),
-                installments: parseInt($('#installments').val())
-            }),
+            data: JSON.stringify(formData),
             success: function(response) {
+                logDebug('Success response:', response);
                 if (response.success) {
                     const result = response.data;
                     $('#simulationResult').html(`
@@ -45,11 +54,15 @@ function handleNovoEmprestimo() {
                     `);
                 }
             },
-            error: function(xhr) {
-                const error = xhr.responseJSON?.error || 'Erro ao realizar simulação';
+            error: function(xhr, status, error) {
+                logDebug('Error details:', {xhr, status, error});
+                const errorMessage = xhr.responseJSON?.error || 'Erro ao realizar simulação';
                 $('#simulationResult').html(`
                     <div class="alert alert-danger">
-                        ${error}
+                        <h4>Erro na simulação</h4>
+                        <p>${errorMessage}</p>
+                        <p>Status: ${status}</p>
+                        <p>Código: ${xhr.status}</p>
                     </div>
                 `);
             }
