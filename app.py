@@ -1,167 +1,153 @@
-from flask import Flask, request, jsonify, render_template, flash, redirect, url_for, session
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_session import Session
-from functools import wraps
-from auth_client import AuthClient
 import requests
+import json
+from datetime import datetime
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+import re
 
-# Load environment variables
 load_dotenv()
-
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
-
-# INSS Proposal Model
-class INSSProposal(db.Model):
-    __tablename__ = 'inss_proposals'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    cpf = db.Column(db.String(11), nullable=False)
-    proposal_type = db.Column(db.String(20), nullable=False)  # 'new', 'portability', 'refinancing'
-    proposal_id = db.Column(db.String(100))
-    status = db.Column(db.String(20), default='pending')
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
 def create_app():
     app = Flask(__name__)
-    
-    # Basic configuration
-    app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
-    
-    # Session configuration
-    app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SESSION_PERMANENT'] = True
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)  # Sessions last 24 hours
-    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
-    app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to session cookie
-    Session(app)
-    
-    # Database configuration - Using SQLite
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialize extensions
     CORS(app)
-    db.init_app(app)
-    migrate.init_app(app, db)
 
-    # Auth client initialization
-    auth_client = AuthClient(
-        auth_server_url=os.getenv('AUTH_SERVER_URL', 'https://af360bank.onrender.com'),
-        app_name="banco-af360bank"
-    )
-    auth_client.init_app(app)
-
-    # Use auth_client's login_required instead of local one
-    login_required = auth_client.login_required
-
-    @app.route('/login')
-    def login():
-        """Redirect to auth server login"""
-        return redirect(os.getenv('AUTH_SERVER_URL', 'https://af360bank.onrender.com') + '/login')
-
-    @app.route('/')
-    @login_required
-    def dashboard():
-        """Dashboard page"""
-        proposals = INSSProposal.query.all()
-        pending_count = sum(1 for p in proposals if p.status == 'pending')
-        approved_count = sum(1 for p in proposals if p.status == 'approved')
-        rejected_count = sum(1 for p in proposals if p.status == 'rejected')
-        total_count = len(proposals)
+    # Helper Functions
+    def validate_cpf(cpf):
+        cpf = ''.join(filter(str.isdigit, cpf))
         
-        return render_template('dashboard.html',
-                             pending_count=pending_count,
-                             approved_count=approved_count,
-                             rejected_count=rejected_count,
-                             total_count=total_count)
+        if len(cpf) != 11:
+            return False
+            
+        # CPF validation algorithm
+        numbers = [int(digit) for digit in cpf]
+        
+        # Validate first digit
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:9], range(10, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[9] != expected_digit:
+            return False
+            
+        # Validate second digit
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:10], range(11, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[10] != expected_digit:
+            return False
+            
+        return True
 
-    @app.route('/inss/novo', methods=['GET', 'POST'])
-    @login_required
+    def get_bcb_interest_rate():
+        # Using BCB API to get SELIC rate
+        url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11/dados/ultimos/1?formato=json"
+        try:
+            response = requests.get(url)
+            data = response.json()
+            return float(data[0]['valor'])
+        except:
+            return 12.75  # Default fallback rate
+
+    def calculate_credit_score(cpf):
+        # Simulated credit score calculation
+        # In a real scenario, you would integrate with a credit score API
+        cpf_sum = sum(int(digit) for digit in str(cpf) if digit.isdigit())
+        base_score = (cpf_sum * 7) % 300 + 300  # Generate score between 300 and 600
+        return base_score
+
+    def calculate_loan_limit(salary, score):
+        # Basic loan limit calculation based on salary and credit score
+        base_limit = salary * 12
+        score_multiplier = score / 600  # Score influence
+        return min(base_limit * score_multiplier, salary * 20)  # Max 20x salary
+
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return jsonify({"status": "healthy"}), 200
+
+    @app.route('/inss/novo', methods=['POST'])
     def inss_novo():
-        if request.method == 'POST':
-            data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='new'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta criada com sucesso!', 'success')
-            return redirect(url_for('dashboard'))
-        return render_template('inss/novo.html')
+        try:
+            data = request.json
 
-    @app.route('/inss/portabilidade', methods=['GET', 'POST'])
-    @login_required
-    def inss_portabilidade():
-        if request.method == 'POST':
-            data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='portability'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de portabilidade criada com sucesso!', 'success')
-            return redirect(url_for('dashboard'))
-        return render_template('inss/portabilidade.html')
+            # Validate required fields
+            required_fields = ['cpf', 'salary', 'loan_amount', 'installments']
+            if not all(field in data for field in required_fields):
+                return jsonify({
+                    "error": "Missing required fields",
+                    "required_fields": required_fields
+                }), 400
 
-    @app.route('/inss/portabilidade-out', methods=['GET', 'POST'])
-    @login_required
-    def inss_portabilidade_out():
-        if request.method == 'POST':
-            data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='portability_out'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de portabilidade out criada com sucesso!', 'success')
-            return redirect(url_for('dashboard'))
-        return render_template('inss/portabilidade_out.html')
+            # CPF validation
+            if not validate_cpf(data['cpf']):
+                return jsonify({"error": "Invalid CPF"}), 400
 
-    @app.route('/inss/refinanciamento', methods=['GET', 'POST'])
-    @login_required
-    def inss_refinanciamento():
-        if request.method == 'POST':
-            data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='refinancing'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de refinanciamento criada com sucesso!', 'success')
-            return redirect(url_for('dashboard'))
-        return render_template('inss/refinanciamento.html')
+            # Basic data validation
+            if data['salary'] <= 0 or data['loan_amount'] <= 0 or data['installments'] <= 0:
+                return jsonify({"error": "Invalid values for salary, loan amount, or installments"}), 400
 
-    @app.route('/auth/login')
-    def auth_login():
-        """Initiate the authentication process"""
-        redirect_uri = url_for('auth_callback', _external=True)
-        return redirect(auth_client.get_authorization_url(redirect_uri))
+            # Get credit score
+            credit_score = calculate_credit_score(data['cpf'])
 
-    @app.route('/auth/logout')
-    def auth_logout():
-        """Handle user logout"""
-        session.clear()
-        return redirect(url_for('dashboard'))
+            # Calculate loan limit
+            loan_limit = calculate_loan_limit(data['salary'], credit_score)
+
+            if data['loan_amount'] > loan_limit:
+                return jsonify({
+                    "error": "Loan amount exceeds available limit",
+                    "available_limit": loan_limit
+                }), 400
+
+            # Get current interest rate
+            base_rate = get_bcb_interest_rate()
+            
+            # Calculate monthly interest rate (base_rate + spread)
+            monthly_rate = (base_rate + 2) / 12 / 100  # Adding 2% spread
+
+            # Calculate monthly payment
+            monthly_payment = (data['loan_amount'] * monthly_rate * (1 + monthly_rate)**data['installments']) / ((1 + monthly_rate)**data['installments'] - 1)
+
+            # Create loan proposal
+            loan_proposal = {
+                "proposal_id": f"PROP-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                "status": "approved",
+                "loan_details": {
+                    "amount": data['loan_amount'],
+                    "installments": data['installments'],
+                    "monthly_payment": round(monthly_payment, 2),
+                    "annual_interest_rate": round(base_rate + 2, 2),
+                    "total_amount": round(monthly_payment * data['installments'], 2)
+                },
+                "customer_info": {
+                    "cpf": data['cpf'],
+                    "credit_score": credit_score,
+                    "salary": data['salary']
+                }
+            }
+
+            return jsonify(loan_proposal), 200
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route('/inss/consulta/<proposal_id>', methods=['GET'])
+    def inss_consulta(proposal_id):
+        # Simplified proposal status check
+        if not proposal_id.startswith('PROP-'):
+            return jsonify({"error": "Invalid proposal ID format"}), 400
+
+        # In a real scenario, this would check a database
+        # Here we're just returning a mock response
+        mock_response = {
+            "proposal_id": proposal_id,
+            "status": "processing",
+            "last_update": datetime.now().isoformat(),
+            "message": "Proposal is being processed"
+        }
+
+        return jsonify(mock_response), 200
 
     return app
 
-# Create the application instance for Gunicorn
-app = create_app()
-
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Create database tables
+    app = create_app()
     app.run(debug=True)
