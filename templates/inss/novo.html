@@ -8,15 +8,15 @@
         <form id="inssForm" class="mt-4">
             <div class="mb-3">
                 <label for="cpf" class="form-label">CPF</label>
-                <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
+                <input type="text" class="form-control" id="cpf" name="cpf" required>
             </div>
             <div class="mb-3">
                 <label for="salary" class="form-label">Renda Mensal</label>
-                <input type="currency" class="form-control" id="salary" name="salary" required>
+                <input type="text" class="form-control money" id="salary" name="salary" required>
             </div>
             <div class="mb-3">
                 <label for="loan_amount" class="form-label">Valor Desejado</label>
-                <input type="currency" class="form-control" id="loan_amount" name="loan_amount" required>
+                <input type="text" class="form-control money" id="loan_amount" name="loan_amount" required>
             </div>
             <div class="mb-3">
                 <label for="installments" class="form-label">Quantidade de Parcelas</label>
@@ -33,32 +33,46 @@
     </div>
 </div>
 {% endblock %}
+
 {% block scripts %}
 <script>
     $(document).ready(function() {
         // Form submission
-        $('#novoEmprestimoForm').on('submit', function(e) {
+        $('#inssForm').on('submit', function(e) {
             e.preventDefault();
             
             $.ajax({
-                url: '/api/simular-inss',
+                url: '/inss/api/simular',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    cpf: $('#cpf').val(),
-                    dataNascimento: $('#dataNascimento').val(),
-                    renda: $('#renda').val().replace(/[^\d]/g, ''),
-                    valorEmprestimo: $('#valorEmprestimo').val().replace(/[^\d]/g, ''),
-                    prazo: $('#prazo').val()
+                    cpf: $('#cpf').val().replace(/[^\d]/g, ''),
+                    salary: parseFloat($('#salary').val().replace(/[^\d,]/g, '').replace(',', '.')),
+                    loan_amount: parseFloat($('#loan_amount').val().replace(/[^\d,]/g, '').replace(',', '.')),
+                    installments: parseInt($('#installments').val())
                 }),
                 success: function(response) {
-                    $('#valorAprovado').text(formatarMoeda(response.valorAprovado));
-                    $('#valorParcela').text(formatarMoeda(response.valorParcela));
-                    $('#taxaJuros').text(response.taxaJuros.toFixed(2) + '%');
-                    $('#resultadoSimulacao').show();
+                    if (response.success) {
+                        const result = response.data;
+                        $('#simulationResult').html(`
+                            <div class="alert alert-success">
+                                <h4>Simulação realizada com sucesso!</h4>
+                                <p>Proposta: ${result.proposal_id}</p>
+                                <p>Valor da parcela: ${formatarMoeda(result.monthly_payment)}</p>
+                                <p>Taxa de juros: ${result.annual_interest_rate}% ao ano</p>
+                                <p>Valor total: ${formatarMoeda(result.total_amount)}</p>
+                                <p>Número de parcelas: ${result.installments}</p>
+                            </div>
+                        `);
+                    }
                 },
                 error: function(xhr) {
-                    alert('Erro ao realizar simulação');
+                    const error = xhr.responseJSON?.error || 'Erro ao realizar simulação';
+                    $('#simulationResult').html(`
+                        <div class="alert alert-danger">
+                            ${error}
+                        </div>
+                    `);
                 }
             });
         });
@@ -68,11 +82,13 @@
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL'
-            }).format(valor / 100);
+            }).format(valor);
         }
 
-        // Initialize money mask
-        $('.money').mask('#.##0,00', { reverse: true });
+        // Initialize input masks
+        $('#cpf').mask('000.000.000-00');
+        $('#salary').mask('#.##0,00', { reverse: true });
+        $('#loan_amount').mask('#.##0,00', { reverse: true });
     });
 </script>
 {% endblock %}

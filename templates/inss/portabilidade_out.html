@@ -1,22 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Portabilidade OUT INSS{% endblock %}
+{% block title %}Portabilidade Out INSS{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 offset-md-2">
-        <h2>Solicitar Portabilidade OUT</h2>
+        <h2>Solicitar Portabilidade Out</h2>
         <form id="portabilidadeOutForm" class="mt-4">
             <div class="mb-3">
                 <label for="cpf" class="form-label">CPF</label>
-                <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
+                <input type="text" class="form-control" id="cpf" name="cpf" required>
             </div>
             <div class="mb-3">
                 <label for="contract_number" class="form-label">Número do Contrato</label>
                 <input type="text" class="form-control" id="contract_number" name="contract_number" required>
             </div>
+            <div class="mb-3">
+                <label for="bank_code" class="form-label">Código do Banco Destino</label>
+                <input type="text" class="form-control" id="bank_code" name="bank_code" required maxlength="3">
+            </div>
             <button type="submit" class="btn btn-primary">Solicitar Portabilidade</button>
         </form>
-        <div id="portabilidadeOutResult" class="mt-4"></div>
+        <div id="requestResult" class="mt-4"></div>
     </div>
 </div>
 {% endblock %}

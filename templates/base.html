@@ -3,77 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} - AF BANK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}AF360 Bank{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="logo-top">
-                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AF BANK Logo">
-                <span>AF BANK</span>
-            </div>
-            <div class="sidebar-content">
-                <ul class="nav flex-column">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AF360 Bank" height="30">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a href="/" class="nav-link {% if request.endpoint == 'index' %}active-item{% endif %}">
-                            <i class="fas fa-home"></i> Dashboard
-                        </a>
+                        <a class="nav-link" href="{{ url_for('inss.novo_emprestimo') }}">Novo Empréstimo</a>
                     </li>
-                    <li class="nav-item menu-item {% if 'inss' in request.endpoint %}active{% endif %}">
-                        <a href="#inssSubmenu" class="nav-link" data-bs-toggle="collapse">
-                            <i class="fas fa-file-alt"></i> INSS
-                            <i class="fas fa-chevron-down ms-auto"></i>
-                        </a>
-                        <ul class="collapse submenu {% if 'inss' in request.endpoint %}show{% endif %}" id="inssSubmenu">
-                            <li>
-                                <a href="/inss/novo" class="nav-link {% if request.endpoint == 'inss_novo' %}active-item{% endif %}">
-                                    <i class="fas fa-plus-circle"></i> Novo Empréstimo
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/inss/portabilidade" class="nav-link {% if request.endpoint == 'inss_portabilidade' %}active-item{% endif %}">
-                                    <i class="fas fa-exchange-alt"></i> Portabilidade
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/inss/portabilidade-out" class="nav-link {% if request.endpoint == 'inss_portabilidade_out' %}active-item{% endif %}">
-                                    <i class="fas fa-sign-out-alt"></i> Portabilidade Out
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/inss/refinanciamento" class="nav-link {% if request.endpoint == 'inss_refinanciamento' %}active-item{% endif %}">
-                                    <i class="fas fa-sync"></i> Refinanciamento
-                                </a>
-                            </li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('inss.portabilidade') }}">Portabilidade</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('inss.portabilidade_out') }}">Portabilidade Out</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('inss.refinanciamento') }}">Refinanciamento</a>
                     </li>
                 </ul>
             </div>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            {% block content %}{% endblock %}
         </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Initialize all collapse elements
-        document.addEventListener('DOMContentLoaded', function() {
-            var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'))
-            var collapseList = collapseElementList.map(function(collapseEl) {
-                return new bootstrap.Collapse(collapseEl, {
-                    toggle: false
-                })
-            })
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
