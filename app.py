@@ -154,10 +154,20 @@ def create_app():
         try:
             # Código que realiza a simulação de INSS
             data = request.json
-            # Simulação de exemplo
-            result = {"simulation": "success", "data": data}
+            cpf = data.get('cpf')
+            
+            # Chamada à API da Receita Federal
+            api_url = f"https://apigateway.conectagov.estaleiro.serpro.gov.br/api-beneficios-previdenciarios/v3/beneficios?cpf={cpf}"
+            headers = {
+                "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
+                "Content-Type": "application/json"
+            }
+            response = requests.get(api_url, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
             return jsonify(result)
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             logger.error(f"Erro ao realizar simulação de INSS: {e}")
             return jsonify({"error": "Erro ao realizar simulação"}), 500
 
