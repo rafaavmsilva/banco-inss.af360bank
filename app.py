@@ -88,7 +88,7 @@ def create_app():
                              approved_count=approved_count,
                              rejected_count=rejected_count,
                              total_count=total_count)
-    
+
     @app.route('/inss/novo', methods=['GET', 'POST'])
     @login_required
     def inss_novo():
