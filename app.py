@@ -9,6 +9,11 @@ import requests
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import logging
+
+# Configure the logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
