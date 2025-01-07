@@ -94,13 +94,33 @@ def create_app():
     def inss_novo():
         if request.method == 'POST':
             data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='new'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta criada com sucesso!', 'success')
+            cpf = data['cpf']
+            
+            # Chamada à API da Receita Federal
+            api_url = f"https://apigateway.conectagov.estaleiro.serpro.gov.br/api-beneficios-previdenciarios/v3/beneficios?cpf={cpf}"
+            headers = {
+                "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
+                "Content-Type": "application/json"
+            }
+            try:
+                response = requests.get(api_url, headers=headers)
+                response.raise_for_status()
+                result = response.json()
+                
+                # Processar a resposta da API e criar a proposta
+                proposal = INSSProposal(
+                    cpf=cpf,
+                    proposal_type='new',
+                    proposal_id=result.get('id', 'N/A'),
+                    status='pending'
+                )
+                db.session.add(proposal)
+                db.session.commit()
+                flash('Proposta criada com sucesso!', 'success')
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Erro ao criar proposta de novo empréstimo: {e}")
+                flash('Erro ao criar proposta de novo empréstimo', 'danger')
+            
             return redirect(url_for('dashboard'))
         return render_template('inss/novo.html')
 
@@ -109,13 +129,33 @@ def create_app():
     def inss_portabilidade():
         if request.method == 'POST':
             data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='portability'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de portabilidade criada com sucesso!', 'success')
+            cpf = data['cpf']
+            
+            # Chamada à API da Receita Federal
+            api_url = f"https://apigateway.conectagov.estaleiro.serpro.gov.br/api-beneficios-previdenciarios/v3/beneficios/pertence-especie?cpf={cpf}"
+            headers = {
+                "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
+                "Content-Type": "application/json"
+            }
+            try:
+                response = requests.get(api_url, headers=headers)
+                response.raise_for_status()
+                result = response.json()
+                
+                # Processar a resposta da API e criar a proposta
+                proposal = INSSProposal(
+                    cpf=cpf,
+                    proposal_type='portability',
+                    proposal_id=result.get('id', 'N/A'),
+                    status='pending'
+                )
+                db.session.add(proposal)
+                db.session.commit()
+                flash('Proposta de portabilidade criada com sucesso!', 'success')
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Erro ao criar proposta de portabilidade: {e}")
+                flash('Erro ao criar proposta de portabilidade', 'danger')
+            
             return redirect(url_for('dashboard'))
         return render_template('inss/portabilidade.html')
 
@@ -124,13 +164,33 @@ def create_app():
     def inss_portabilidade_out():
         if request.method == 'POST':
             data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='portability_out'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de portabilidade out criada com sucesso!', 'success')
+            cpf = data['cpf']
+            
+            # Chamada à API da Receita Federal
+            api_url = f"https://apigateway.conectagov.estaleiro.serpro.gov.br/api-beneficios-previdenciarios/v3/beneficios/pertence-especie-87?cpf={cpf}"
+            headers = {
+                "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
+                "Content-Type": "application/json"
+            }
+            try:
+                response = requests.get(api_url, headers=headers)
+                response.raise_for_status()
+                result = response.json()
+                
+                # Processar a resposta da API e criar a proposta
+                proposal = INSSProposal(
+                    cpf=cpf,
+                    proposal_type='portability_out',
+                    proposal_id=result.get('id', 'N/A'),
+                    status='pending'
+                )
+                db.session.add(proposal)
+                db.session.commit()
+                flash('Proposta de portabilidade out criada com sucesso!', 'success')
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Erro ao criar proposta de portabilidade out: {e}")
+                flash('Erro ao criar proposta de portabilidade out', 'danger')
+            
             return redirect(url_for('dashboard'))
         return render_template('inss/portabilidade_out.html')
 
@@ -139,13 +199,33 @@ def create_app():
     def inss_refinanciamento():
         if request.method == 'POST':
             data = request.form
-            proposal = INSSProposal(
-                cpf=data['cpf'],
-                proposal_type='refinancing'
-            )
-            db.session.add(proposal)
-            db.session.commit()
-            flash('Proposta de refinanciamento criada com sucesso!', 'success')
+            cpf = data['cpf']
+            
+            # Chamada à API da Receita Federal
+            api_url = f"https://apigateway.conectagov.estaleiro.serpro.gov.br/api-beneficios-previdenciarios/v3/beneficios?cpf={cpf}"
+            headers = {
+                "Authorization": f"Bearer {os.getenv('API_TOKEN')}",
+                "Content-Type": "application/json"
+            }
+            try:
+                response = requests.get(api_url, headers=headers)
+                response.raise_for_status()
+                result = response.json()
+                
+                # Processar a resposta da API e criar a proposta
+                proposal = INSSProposal(
+                    cpf=cpf,
+                    proposal_type='refinancing',
+                    proposal_id=result.get('id', 'N/A'),
+                    status='pending'
+                )
+                db.session.add(proposal)
+                db.session.commit()
+                flash('Proposta de refinanciamento criada com sucesso!', 'success')
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Erro ao criar proposta de refinanciamento: {e}")
+                flash('Erro ao criar proposta de refinanciamento', 'danger')
+            
             return redirect(url_for('dashboard'))
         return render_template('inss/refinanciamento.html')
 
