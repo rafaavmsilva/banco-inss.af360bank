@@ -88,7 +88,7 @@ def create_app():
                              approved_count=approved_count,
                              rejected_count=rejected_count,
                              total_count=total_count)
-
+    
     @app.route('/inss/novo', methods=['GET', 'POST'])
     @login_required
     def inss_novo():
@@ -262,6 +262,157 @@ def create_app():
         """Handle user logout"""
         session.clear()
         return redirect(url_for('dashboard'))
+
+    @app.route('/social_security/benefits_request', methods=['POST'])
+    def benefits_request():
+        data = request.json
+        cpf = data.get('cpf')
+        legal_representative_document_number = data.get('legal_representative_document_number')
+        signer = data.get('signer')
+        authorization_term = data.get('authorization_term')
+
+        # Simulação de resposta com base no primeiro dígito do CPF
+        first_digit = cpf[0]
+        if first_digit == '1':
+            # Sucesso
+            return jsonify({
+                "status": "Success",
+                "benefit_status": "Elegible"
+            }), 200
+        else:
+            # Falha
+            return jsonify({
+                "status": "Failure",
+                "enumerator": "inexistent_beneficiary",
+                "description": "no beneficiary found"
+            }), 400
+
+    @app.route('/social_security/balance_request', methods=['POST'])
+    def balance_request():
+        data = request.json
+        cpf = data.get('cpf')
+        legal_representative_document_number = data.get('legal_representative_document_number')
+        signer = data.get('signer')
+        authorization_term = data.get('authorization_term')
+
+        # Simulação de resposta com base no primeiro dígito do CPF
+        first_digit = cpf[0]
+        if first_digit == '1':
+            # Sucesso
+            return jsonify({
+                "status": "Success",
+                "assistance_type": "retirement_by_age",
+                "benefit_status": "active",
+                "has_entity_representation": False,
+                "alimony_code": "not_payer",
+                "has_judicial_concession": False,
+                "has_power_of_attorney": False,
+                "credit_type": "checking_account",
+                "benefit_situation": "active",
+                "used_total_balance": 1000.00,
+                "max_total_balance": 5000.00,
+                "available_total_balance": 4000.00,
+                "benefit_quota_expiration_date": None,
+                "block_type": "0",
+                "politically_exposed": {
+                    "type": "0",
+                    "is_politically_exposed": False
+                }
+            }), 200
+        else:
+            # Falha
+            return jsonify({
+                "status": "Failure",
+                "enumerator": "inexistent_beneficiary",
+                "description": "no beneficiary found"
+            }), 400
+
+    @app.route('/debt_simulation', methods=['POST'])
+    def debt_simulation():
+        data = request.json
+        borrower = data.get('borrower')
+        financial = data.get('financial')
+        collaterals = data.get('collaterals')
+        refinanced_credit_operations = data.get('refinanced_credit_operations', [])
+
+        # Simulação de resposta
+        return jsonify({
+            "status": "Success",
+            "installment_value": financial['installment_face_value'],
+            "disbursed_amount": financial['installment_face_value'] * financial['number_of_installments']
+        }), 200
+
+    @app.route('/debt', methods=['POST'])
+    def create_debt():
+        data = request.json
+        borrower = data.get('borrower')
+        financial = data.get('financial')
+        collaterals = data.get('collaterals')
+        related_parties = data.get('related_parties', [])
+        additional_data = data.get('additional_data', {})
+        disbursement_bank_accounts = data.get('disbursement_bank_accounts', [])
+
+        # Simulação de resposta
+        return jsonify({
+            "status": "Success",
+            "debt_key": "DEBT-KEY-12345"
+        }), 200
+
+    @app.route('/upload', methods=['POST'])
+    def upload_document():
+        # Simulação de upload de documento
+        return jsonify({
+            "document_key": "DOCUMENT-KEY-12345"
+        }), 200
+
+    @app.route('/debt/<debt_key>/signed', methods=['POST'])
+    def sign_debt(debt_key):
+        data = request.json
+        ip_address = data.get('ip_address')
+        signature_datetime = data.get('signature_datetime')
+
+        # Simulação de resposta
+        return jsonify({
+            "status": "Success"
+        }), 200
+
+    @app.route('/debt/<debt_key>/cancel_permanently', methods=['POST'])
+    def cancel_debt_permanently(debt_key):
+        # Simulação de cancelamento permanente
+        return jsonify({
+            "status": "canceled_permanently"
+        }), 200
+
+    @app.route('/debt/<debt_key>/change_disbursement_date', methods=['POST'])
+    def change_disbursement_date(debt_key):
+        data = request.json
+        new_disbursement_date = data.get('new_disbursement_date')
+
+        # Simulação de resposta
+        return jsonify({
+            "status": "Success",
+            "new_disbursement_date": new_disbursement_date
+        }), 200
+
+    @app.route('/debt/<debt_key>/collateral', methods=['GET'])
+    def get_last_response(debt_key):
+        # Simulação de resposta
+        return jsonify({
+            "status": "Success",
+            "enumerator": "successfully_included",
+            "reservation_method": "new_credit"
+        }), 200
+
+    @app.route('/webhook', methods=['POST'])
+    def webhook():
+        data = request.json
+        webhook_type = data.get('webhook_type')
+        status = data.get('status')
+
+        # Simulação de resposta
+        return jsonify({
+            "status": "Received"
+        }), 200
 
     return app
 
