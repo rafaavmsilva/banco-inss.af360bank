@@ -149,6 +149,18 @@ def create_app():
             return redirect(url_for('dashboard'))
         return render_template('inss/refinanciamento.html')
 
+    @app.route('/simulate_inss', methods=['POST'])
+    def simulate_inss():
+        try:
+            # Código que realiza a simulação de INSS
+            data = request.json
+            # Simulação de exemplo
+            result = {"simulation": "success", "data": data}
+            return jsonify(result)
+        except Exception as e:
+            logger.error(f"Erro ao realizar simulação de INSS: {e}")
+            return jsonify({"error": "Erro ao realizar simulação"}), 500
+
     @app.route('/auth/login')
     def auth_login():
         """Initiate the authentication process"""
